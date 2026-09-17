@@ -1,0 +1,1 @@
+{"status":"ok","api_version":"1.0.0","database":{"path":"/home/monis/sih2026/apix/data/apix.db","schema_version":5,"expected_schema_version":5,"observations":17036,"last_collected_at":"2026-09-17 10:07:57.504392"},"cache":{"cached":true,"observations_at_cache_time":17036,"age_seconds":0.6,"compute_seconds":0.222}}

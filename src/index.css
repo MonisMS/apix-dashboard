@@ -1,0 +1,481 @@
+@import 'tailwindcss';
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Single source of truth for color. Every component consumes these tokens
+ * via Tailwind utilities (bg-background, text-muted-foreground, ...) --
+ * never a raw hex code or a default Tailwind palette class. Derived from the
+ * project's original navy institutional scale (see git history of theme.js).
+ */
+:root {
+  --background: #f3f5f7;
+  --foreground: #12263a;
+
+  --card: #ffffff;
+  --card-foreground: #12263a;
+
+  --popover: #ffffff;
+  --popover-foreground: #12263a;
+
+  --primary: #12263a;
+  --primary-foreground: #f3f5f7;
+
+  --secondary: #e4e9ee;
+  --secondary-foreground: #12263a;
+
+  --muted: #e4e9ee;
+  --muted-foreground: #5b6b7a;
+
+  --accent: #dce4ec;
+  --accent-foreground: #12263a;
+
+  --destructive: #b3261e;
+  --destructive-foreground: #ffffff;
+
+  --success: #0f6e5c;
+  --success-foreground: #ffffff;
+
+  --warning: #b3711e;
+  --warning-foreground: #ffffff;
+
+  --border: #d7dee5;
+  --input: #d7dee5;
+  --ring: #12263a;
+
+  --chart-1: #12263a;
+  --chart-2: #2f5170;
+  --chart-3: #5b85a3;
+  --chart-4: #93b3c6;
+  --chart-5: #c3d2dc;
+
+  --radius: 0.375rem;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #12263a;
+  --sidebar-primary: #12263a;
+  --sidebar-primary-foreground: #f3f5f7;
+  --sidebar-accent: #e4e9ee;
+  --sidebar-accent-foreground: #12263a;
+  --sidebar-border: #d7dee5;
+  --sidebar-ring: #12263a;
+}
+
+:root.dark,
+.dark {
+  --background: #0b1622;
+  --foreground: #e7edf2;
+
+  --card: #101f30;
+  --card-foreground: #e7edf2;
+
+  --popover: #101f30;
+  --popover-foreground: #e7edf2;
+
+  --primary: #e7edf2;
+  --primary-foreground: #0b1622;
+
+  --secondary: #16283a;
+  --secondary-foreground: #e7edf2;
+
+  --muted: #16283a;
+  --muted-foreground: #93a3b3;
+
+  --accent: #1c3247;
+  --accent-foreground: #e7edf2;
+
+  --destructive: #e5645b;
+  --destructive-foreground: #0b1622;
+
+  --success: #3fb89b;
+  --success-foreground: #0b1622;
+
+  --warning: #d99a4e;
+  --warning-foreground: #0b1622;
+
+  --border: #223a4f;
+  --input: #223a4f;
+  --ring: #93a3b3;
+
+  --chart-1: #e7edf2;
+  --chart-2: #c3d2dc;
+  --chart-3: #93b3c6;
+  --chart-4: #5b85a3;
+  --chart-5: #2f5170;
+
+  --sidebar: #0e1c2b;
+  --sidebar-foreground: #e7edf2;
+  --sidebar-primary: #e7edf2;
+  --sidebar-primary-foreground: #0b1622;
+  --sidebar-accent: #16283a;
+  --sidebar-accent-foreground: #e7edf2;
+  --sidebar-border: #223a4f;
+  --sidebar-ring: #93a3b3;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-family: var(--font-mono);
+  }
+  .apix-table-striped tbody tr:nth-child(even) {
+    background: var(--muted);
+  }
+}
+
+/*
+ * Landing-page palette. The same token names as :root, rebound to the
+ * near-grayscale "instrument panel" scale the landing brief specifies, so
+ * every shared component (Button, Card, Badge) renders in it unchanged and no
+ * second design system appears. Scoped: the dashboard keeps its navy scale.
+ *
+ * Hues are deliberately NOT rebound here -- --chart-*, --success, --warning
+ * and --destructive inherit from :root, which is the rule that keeps colour
+ * reserved for data and the chrome monochrome. --primary is the ink itself,
+ * so interaction has no accent hue of its own.
+ */
+.landing-theme {
+  --background: #fbfbfa;
+  --foreground: #17181a;
+
+  --card: #ffffff;
+  --card-foreground: #17181a;
+
+  --popover: #ffffff;
+  --popover-foreground: #17181a;
+
+  --primary: #17181a;
+  --primary-foreground: #fbfbfa;
+
+  --secondary: #f1f1ef;
+  --secondary-foreground: #4a4d52;
+
+  --muted: #f1f1ef;
+  --muted-foreground: #5c6066;
+
+  --accent: #ecece9;
+  --accent-foreground: #17181a;
+
+  --border: rgba(23, 24, 26, 0.1);
+  --input: rgba(23, 24, 26, 0.1);
+  --ring: #17181a;
+
+  --radius: 7px;
+
+  /* Extra steps the globe's lit-ocean gradient needs: :root has --border but
+     no stronger rule, and no surface between --card and --background. */
+  --rule-strong: #cfcfcb;
+  --surface-2: #f5f5f3;
+  --warn-fill: #d9a22b;
+
+  /* Secondary ink -- the H1's qualifier clause and nav rest state. Between
+     --foreground and --muted-foreground, which is a step :root has no token
+     for, so it is named rather than inlined as a hex in the JSX. */
+  --ink-2: #4a4d52;
+}
+
+/*
+ * Dark mode follows the app's existing mechanism -- the .dark class that
+ * useDarkMode() puts on <html> -- rather than a bare prefers-color-scheme
+ * query. That hook already *defaults* to the system preference on a first
+ * visit, so a dark-OS visitor still lands in dark; the difference is that an
+ * explicit toggle to light is not overridden by the OS here.
+ */
+.dark .landing-theme,
+.landing-theme.dark {
+  --background: #0c0d0e;
+  --foreground: #f2f2f0;
+
+  --card: #141517;
+  --card-foreground: #f2f2f0;
+
+  --popover: #141517;
+  --popover-foreground: #f2f2f0;
+
+  --primary: #f2f2f0;
+  --primary-foreground: #0c0d0e;
+
+  --secondary: #1b1c1e;
+  --secondary-foreground: #c8c8c4;
+
+  --muted: #1b1c1e;
+  --muted-foreground: #9a9da2;
+
+  --accent: #222325;
+  --accent-foreground: #f2f2f0;
+
+  --border: rgba(242, 242, 240, 0.12);
+  --input: rgba(242, 242, 240, 0.12);
+  --ring: #9a9da2;
+
+  --ink-2: #c8c8c4;
+  --rule-strong: #383b3f;
+  --surface-2: #1b1d1f;
+  --warn-fill: #e3a33f;
+}
+
+/* Hero: copy column capped at 48% of the row, visual takes the rest. Stacks
+   at 960px, which is where the 46ch measure and the map stop coexisting. */
+/* The hero runs dark in both themes -- it is the one full-bleed panel on the
+   site, and the globe's lit ocean only reads against a dark ground. */
+.landing-hero {
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  min-height: clamp(420px, 62vh, 620px);
+}
+
+.landing-globe {
+  min-height: clamp(380px, 60vh, 600px);
+}
+
+.landing-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 48%) 1fr;
+  align-items: center;
+}
+
+.landing-stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 38px;
+  border-top: 1px solid var(--border);
+  padding-top: 22px;
+}
+
+@media (max-width: 960px) {
+  .landing-hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .landing-hero {
+    min-height: 0;
+  }
+  .landing-globe {
+    order: 1;
+    min-height: 280px;
+  }
+  .landing-copy {
+    order: 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===================================================== LANDING CONSOLE
+   The index view below the hero. Same panel geometry as the console
+   layout we're matching: 11px cards, hairline borders, no shadows, mono
+   for every figure. Prefixed lc- and used only inside .landing-theme. */
+
+.lc-body {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 26px 22px 40px;
+}
+
+.lc-explain {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border-left: 2px solid var(--rule-strong);
+  padding: 2px 0 2px 16px;
+  margin: 0 0 22px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 96ch;
+}
+.lc-explain b { font-weight: 600; color: var(--foreground); }
+
+.lc-grid { display: grid; gap: 14px; }
+
+.lc-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 22px 24px;
+  min-width: 0;
+}
+
+.lc-panel {
+  display: grid;
+  grid-template-columns: minmax(270px, 320px) 1fr;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  overflow: hidden;
+}
+.lc-panel-l {
+  padding: 24px 26px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+.lc-panel-r { padding: 22px 24px 14px; min-width: 0; }
+
+.lc-lbl {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.lc-fig {
+  font-family: var(--font-mono);
+  font-size: 56px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -.04em;
+  margin: 10px 0 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.lc-delta-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+.lc-delta {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.lc-delta .sm { font-size: 11px; color: var(--muted-foreground); letter-spacing: .06em; }
+
+.lc-prov {
+  border-top: 1px solid var(--border);
+  padding-top: 16px; margin-top: auto;
+  display: flex; flex-direction: column; gap: 9px;
+}
+.lc-prow { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
+.lc-prow .k {
+  color: var(--muted-foreground); font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: .07em; text-transform: uppercase;
+}
+.lc-prow .v {
+  font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+  color: var(--ink-2); font-variant-numeric: tabular-nums;
+}
+
+.lc-finding { font-size: 17.5px; font-weight: 600; letter-spacing: -.02em; line-height: 1.3; color: var(--foreground); }
+.lc-sub { color: var(--muted-foreground); font-size: 14px; margin-top: 6px; max-width: 66ch; line-height: 1.55; }
+
+.lc-card-h { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 14px; }
+
+.lc-seg { display: flex; background: var(--surface-2); border-radius: 8px; padding: 3px; gap: 3px; }
+.lc-seg button {
+  background: none; border: 0; padding: 8px 14px; min-height: 36px; border-radius: 6px;
+  cursor: pointer; font-size: 13px; color: var(--muted-foreground); font-weight: 500;
+}
+.lc-seg button:hover { color: var(--ink-2); }
+.lc-seg button[aria-pressed="true"] { background: var(--card); color: var(--foreground); font-weight: 600; }
+
+.lc-legend { display: flex; flex-wrap: wrap; gap: 18px; margin: 12px 0 4px; }
+.lc-lg { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted-foreground); }
+.lc-lg i { width: 10px; height: 10px; border-radius: 2px; display: block; flex-shrink: 0; }
+
+.lc-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  overflow: hidden;
+}
+.lc-stat { background: var(--card); padding: 18px 20px; display: flex; flex-direction: column; gap: 3px; }
+.lc-stat .k {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .11em;
+  text-transform: uppercase; color: var(--muted-foreground);
+}
+.lc-stat .v {
+  font-family: var(--font-mono); font-size: 25px; font-weight: 500;
+  letter-spacing: -.028em; line-height: 1.12; color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+.lc-stat .n { font-size: 12.5px; color: var(--muted-foreground); line-height: 1.45; }
+
+.lc-g2 { display: grid; gap: 14px; grid-template-columns: 1.32fr 1fr; }
+
+.lc-code {
+  margin: 0; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 15px 17px; font-family: var(--font-mono); font-size: 11.5px; line-height: 1.75;
+  overflow-x: auto; color: var(--ink-2);
+}
+
+.lc-note {
+  font-size: 13px; color: var(--muted-foreground); margin-top: 16px;
+  padding-top: 15px; border-top: 1px solid var(--border); line-height: 1.6;
+}
+.lc-note b { color: var(--ink-2); font-weight: 600; }
+
+@media (max-width: 900px) {
+  .lc-panel { grid-template-columns: 1fr; }
+  .lc-panel-l { border-right: 0; border-bottom: 1px solid var(--border); }
+  .lc-g2 { grid-template-columns: 1fr; }
+}
