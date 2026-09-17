@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Moon, Play, Sun, TrendingUp, X } from 'lucide-react';
+import { LayoutDashboard, Moon, Play, Sun, TrendingUp, X } from 'lucide-react';
 import {
   Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer,
   Tooltip as RTooltip, XAxis, YAxis,
@@ -10,6 +10,7 @@ import { useAudit, useCollection, useIndex, useRoutes, useWeights, useWindows } 
 import { count, idx, pct, sharePct, shortDate } from '../format';
 import { SERIES_COLORS } from '../chartTokens';
 import { Globe } from '../components/Globe';
+import { NetworkMap } from '../components/NetworkMap';
 import { GuidedTour } from '../components/GuidedTour';
 import { useDarkMode } from '../hooks/useDarkMode';
 
@@ -41,14 +42,6 @@ function useIstClock() {
   const time = ist.toLocaleTimeString('en-GB', { hour12: false });
   return { time, nextIn: nextCollectionLabel(now) };
 }
-
-/** Centre nav. Four tabs, all real routes registered in main.jsx. */
-const TABS = [
-  { to: '/overview', label: 'Overview' },
-  { to: '/routes', label: 'Routes' },
-  { to: '/methodology', label: 'Methodology' },
-  { to: '/api-docs', label: 'API' },
-];
 
 const SERIES_MODES = [
   { label: 'Headline', value: 'headline' },
@@ -164,6 +157,9 @@ export default function Landing() {
   const routeCount = routes.data?.n_routes ?? null;
   const observations = collection.data?.summary?.observations ?? null;
 
+  const rankedRoutes = [...(routes.data?.routes ?? [])].sort((a, b) => (b.weight ?? 0) - (a.weight ?? 0)).slice(0, 10);
+  const basketPax = (routes.data?.routes ?? []).reduce((sum, r) => sum + (r.pax_cy ?? 0), 0) || null;
+
   const showShortfall = !noticeDismissed && last?.n_cells_imputed > 0;
   const indexLabel = last ? `Index, ${shortDate(last.period_end)}` : 'Index';
 
@@ -247,69 +243,55 @@ export default function Landing() {
   ];
 
   return (
-    <div className="landing-theme min-h-screen bg-background text-foreground">
+    <div className="landing-theme min-h-screen bg-background text-foreground" style={{ '--page-bg': 'var(--background)' }}>
       <GuidedTour run={tourRunning} onFinish={() => setTourRunning(false)} page="landing" />
 
-      {/*
-        Header and hero run dark in both themes -- one full-bleed console
-        panel at the top of an otherwise light page. The status band sits
-        above the header rather than inside it.
-      */}
-      <div className="dark landing-theme bg-background text-foreground">
-        <div className="sticky top-0 z-40">
-          {showShortfall && <ShortfallBar point={last} onDismiss={() => setNoticeDismissed(true)} />}
+      <div className="sticky top-0 z-40">
+        {showShortfall && <ShortfallBar point={last} onDismiss={() => setNoticeDismissed(true)} />}
 
-          <header className="border-b border-border bg-background">
-            <div className="flex flex-wrap items-center gap-x-8 gap-y-3 px-5 py-2.5 md:px-6">
-              <Link to="/" className="flex shrink-0 items-center gap-2.5">
-                <LogoMark />
-                <span className="leading-tight">
-                  <span className="block text-[15px] font-bold tracking-[.01em]">APIx</span>
-                  <span className="block text-[11px] text-muted-foreground">
-                    Ministry of Statistics &middot; Problem SIH26056
-                  </span>
+        <header className="border-b border-border bg-background">
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-3 px-5 py-2.5 md:px-6">
+            <Link to="/" className="flex shrink-0 items-center gap-2.5">
+              <LogoMark />
+              <span className="leading-tight">
+                <span className="block text-[15px] font-bold tracking-[.01em]">APIx</span>
+                <span className="block text-[11px] text-muted-foreground">
+                  Ministry of Statistics &middot; Problem SIH26056
                 </span>
+              </span>
+            </Link>
+
+            <nav aria-label="Primary" className="hidden lg:flex">
+              <Link
+                to="/overview"
+                className="inline-flex items-center gap-1.5 text-[14.5px] font-medium text-foreground hover:text-muted-foreground"
+              >
+                <LayoutDashboard className="h-4 w-4" aria-hidden="true" /> Dashboard
               </Link>
+            </nav>
 
-              <nav aria-label="Primary" className="hidden items-center gap-7 text-[14.5px] lg:flex">
-                {TABS.map((tab, i) => (
-                  <Link
-                    key={tab.to}
-                    to={tab.to}
-                    aria-current={i === 0 ? 'page' : undefined}
-                    className={
-                      i === 0
-                        ? 'border-b-2 border-foreground pb-1 font-medium text-foreground'
-                        : 'border-b-2 border-transparent pb-1 text-muted-foreground hover:text-foreground'
-                    }
-                  >
-                    {tab.label}
-                  </Link>
-                ))}
-              </nav>
-
-              <div className="ml-auto flex shrink-0 items-center gap-5">
-                <Button
-                  size="sm"
-                  className="h-10 rounded-[7px] px-4 text-[14.5px] font-medium"
-                  onClick={() => setTourRunning(true)}
-                  data-tour="guide-me"
-                >
-                  <Play className="h-3.5 w-3.5" aria-hidden="true" /> Guide me
-                </Button>
-                <div className="hidden text-right leading-tight sm:block">
-                  <div className="tabular text-[13px] text-foreground">{clock.time} IST</div>
-                  <div className="tabular text-[11.5px] text-muted-foreground">
-                    next check in {clock.nextIn}
-                  </div>
+            <div className="ml-auto flex shrink-0 items-center gap-5">
+              <Button
+                size="sm"
+                className="h-10 rounded-[7px] px-4 text-[14.5px] font-medium"
+                onClick={() => setTourRunning(true)}
+                data-tour="guide-me"
+              >
+                <Play className="h-3.5 w-3.5" aria-hidden="true" /> Guide me
+              </Button>
+              <div className="hidden text-right leading-tight sm:block">
+                <div className="tabular text-[13px] text-foreground">{clock.time} IST</div>
+                <div className="tabular text-[11.5px] text-muted-foreground">
+                  next check in {clock.nextIn}
                 </div>
-                <ThemeToggle />
               </div>
+              <ThemeToggle />
             </div>
-          </header>
-        </div>
+          </div>
+        </header>
+      </div>
 
-        <section className="landing-hero landing-hero-grid">
+      <section className="landing-hero landing-hero-grid">
           <div className="landing-copy max-w-[620px] px-[26px] py-[46px]">
             <h1
               className="font-semibold"
@@ -366,8 +348,8 @@ export default function Landing() {
           </div>
 
           <Globe className="landing-globe" data-tour="route-map" />
-        </section>
-      </div>
+      </section>
+      <div className="landing-hero-fade" aria-hidden="true" />
 
       <main className="lc-body">
         <div className="lc-explain">
@@ -511,6 +493,46 @@ export default function Landing() {
               <span className="n">its weight in the 2024 basket</span>
             </div>
           </div>
+
+          <section>
+            <div className="lc-finding">Where the basket reaches</div>
+            <p className="lc-sub" style={{ marginBottom: 14 }}>
+              Click a hub or a corridor chip to inspect it. The moving beacon is a visualization of
+              the selected corridor, not live flight tracking &mdash; the index, cells priced, and
+              basket weight shown for it are real, pulled from the same data as the table above.
+            </p>
+            <div className="netmap-layout">
+              <NetworkMap routes={routes.data?.routes ?? []} />
+              <aside className="netmap-notes">
+                <div className="netmap-note-figure">
+                  <strong>{count(basketPax)}</strong>
+                  <p>
+                    DGCA passenger journeys (CY2025) represented across {count(routes.data?.n_routes)}{' '}
+                    monitored city-pairs.
+                  </p>
+                </div>
+                <div>
+                  <div className="netmap-ranking-header">
+                    <span className="eyebrow">Highest-weighted corridors</span>
+                    <span className="tag">Basket share</span>
+                  </div>
+                  {rankedRoutes.map((r, i) => (
+                    <div className="netmap-hub-row" key={r.pair}>
+                      <span>{String(i + 1).padStart(2, '0')}</span>
+                      <div>
+                        <strong>{r.pair}</strong>
+                        <small>{count(r.pax_cy)} DGCA passengers, CY2025</small>
+                      </div>
+                      <span className="netmap-hub-share">{sharePct(r.weight, 1)}</span>
+                    </div>
+                  ))}
+                  {rankedRoutes.length === 0 && (
+                    <p className="text-xs text-muted-foreground">Route weights are unavailable right now.</p>
+                  )}
+                </div>
+              </aside>
+            </div>
+          </section>
 
           <div className="lc-g2">
             <section className="lc-card" data-tour="provenance">

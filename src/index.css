@@ -10,112 +10,118 @@
 /*
  * Single source of truth for color. Every component consumes these tokens
  * via Tailwind utilities (bg-background, text-muted-foreground, ...) --
- * never a raw hex code or a default Tailwind palette class. Derived from the
- * project's original navy institutional scale (see git history of theme.js).
+ * never a raw hex code or a default Tailwind palette class.
+ *
+ * Editorial "paper ledger" palette -- paper/ink/green, sharp corners, serif
+ * headings + mono figures. Ported from the Airfare-CPI reference (rival
+ * SIH26056 submission, MIT licensed): studied its globals.css directly
+ * rather than reusing its file, and fixed the tokens that were broken there
+ * (--foreground/--radius-lg were referenced with no real definition -- this
+ * scale defines every token it uses, with no dangling var() fallbacks).
  */
 :root {
-  --background: #f3f5f7;
-  --foreground: #12263a;
+  --background: #f7f5f0;
+  --foreground: #191917;
 
-  --card: #ffffff;
-  --card-foreground: #12263a;
+  --card: #fffdf8;
+  --card-foreground: #191917;
 
-  --popover: #ffffff;
-  --popover-foreground: #12263a;
+  --popover: #fffdf8;
+  --popover-foreground: #191917;
 
-  --primary: #12263a;
-  --primary-foreground: #f3f5f7;
+  --primary: #191917;
+  --primary-foreground: #f7f5f0;
 
-  --secondary: #e4e9ee;
-  --secondary-foreground: #12263a;
+  --secondary: #efece3;
+  --secondary-foreground: #191917;
 
-  --muted: #e4e9ee;
-  --muted-foreground: #5b6b7a;
+  --muted: #efece3;
+  --muted-foreground: #77746d;
 
-  --accent: #dce4ec;
-  --accent-foreground: #12263a;
+  --accent: #e6eee5;
+  --accent-foreground: #191917;
 
   --destructive: #b3261e;
   --destructive-foreground: #ffffff;
 
-  --success: #0f6e5c;
+  --success: #3b6d4d;
   --success-foreground: #ffffff;
 
-  --warning: #b3711e;
+  --warning: #b27a31;
   --warning-foreground: #ffffff;
 
-  --border: #d7dee5;
-  --input: #d7dee5;
-  --ring: #12263a;
+  --border: rgba(25, 25, 23, 0.13);
+  --input: rgba(25, 25, 23, 0.13);
+  --ring: #191917;
 
-  --chart-1: #12263a;
-  --chart-2: #2f5170;
-  --chart-3: #5b85a3;
-  --chart-4: #93b3c6;
-  --chart-5: #c3d2dc;
+  --chart-1: #191917;
+  --chart-2: #3b6d4d;
+  --chart-3: #6b9179;
+  --chart-4: #9ac3a0;
+  --chart-5: #c7ddc9;
 
-  --radius: 0.375rem;
+  --radius: 0rem;
 
-  --sidebar: #ffffff;
-  --sidebar-foreground: #12263a;
-  --sidebar-primary: #12263a;
-  --sidebar-primary-foreground: #f3f5f7;
-  --sidebar-accent: #e4e9ee;
-  --sidebar-accent-foreground: #12263a;
-  --sidebar-border: #d7dee5;
-  --sidebar-ring: #12263a;
+  --sidebar: #fffdf8;
+  --sidebar-foreground: #191917;
+  --sidebar-primary: #191917;
+  --sidebar-primary-foreground: #f7f5f0;
+  --sidebar-accent: #efece3;
+  --sidebar-accent-foreground: #191917;
+  --sidebar-border: rgba(25, 25, 23, 0.13);
+  --sidebar-ring: #191917;
 }
 
 :root.dark,
 .dark {
-  --background: #0b1622;
-  --foreground: #e7edf2;
+  --background: #151815;
+  --foreground: #f3f1e9;
 
-  --card: #101f30;
-  --card-foreground: #e7edf2;
+  --card: #1c211d;
+  --card-foreground: #f3f1e9;
 
-  --popover: #101f30;
-  --popover-foreground: #e7edf2;
+  --popover: #1c211d;
+  --popover-foreground: #f3f1e9;
 
-  --primary: #e7edf2;
-  --primary-foreground: #0b1622;
+  --primary: #f3f1e9;
+  --primary-foreground: #151815;
 
-  --secondary: #16283a;
-  --secondary-foreground: #e7edf2;
+  --secondary: #20251f;
+  --secondary-foreground: #f3f1e9;
 
-  --muted: #16283a;
-  --muted-foreground: #93a3b3;
+  --muted: #20251f;
+  --muted-foreground: #aaa9a0;
 
-  --accent: #1c3247;
-  --accent-foreground: #e7edf2;
+  --accent: #25352b;
+  --accent-foreground: #f3f1e9;
 
   --destructive: #e5645b;
-  --destructive-foreground: #0b1622;
+  --destructive-foreground: #151815;
 
-  --success: #3fb89b;
-  --success-foreground: #0b1622;
+  --success: #9ac3a0;
+  --success-foreground: #151815;
 
-  --warning: #d99a4e;
-  --warning-foreground: #0b1622;
+  --warning: #fbbf24;
+  --warning-foreground: #151815;
 
-  --border: #223a4f;
-  --input: #223a4f;
-  --ring: #93a3b3;
+  --border: rgba(255, 255, 255, 0.15);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #aaa9a0;
 
-  --chart-1: #e7edf2;
-  --chart-2: #c3d2dc;
-  --chart-3: #93b3c6;
-  --chart-4: #5b85a3;
-  --chart-5: #2f5170;
+  --chart-1: #f3f1e9;
+  --chart-2: #9ac3a0;
+  --chart-3: #6f9a7a;
+  --chart-4: #4a7358;
+  --chart-5: #2c4636;
 
-  --sidebar: #0e1c2b;
-  --sidebar-foreground: #e7edf2;
-  --sidebar-primary: #e7edf2;
-  --sidebar-primary-foreground: #0b1622;
-  --sidebar-accent: #16283a;
-  --sidebar-accent-foreground: #e7edf2;
-  --sidebar-border: #223a4f;
-  --sidebar-ring: #93a3b3;
+  --sidebar: #1c211d;
+  --sidebar-foreground: #f3f1e9;
+  --sidebar-primary: #f3f1e9;
+  --sidebar-primary-foreground: #151815;
+  --sidebar-accent: #20251f;
+  --sidebar-accent-foreground: #f3f1e9;
+  --sidebar-border: rgba(255, 255, 255, 0.15);
+  --sidebar-ring: #aaa9a0;
 }
 
 @theme inline {
@@ -161,6 +167,7 @@
   --radius-xl: calc(var(--radius) + 4px);
   --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-serif: 'Source Serif 4', 'Iowan Old Style', Georgia, serif;
 }
 
 @layer base {
@@ -180,13 +187,18 @@
   .apix-table-striped tbody tr:nth-child(even) {
     background: var(--muted);
   }
+  h1, h2, h3 {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+  }
 }
 
 /*
- * Landing-page palette. The same token names as :root, rebound to the
- * near-grayscale "instrument panel" scale the landing brief specifies, so
- * every shared component (Button, Card, Badge) renders in it unchanged and no
- * second design system appears. Scoped: the dashboard keeps its navy scale.
+ * Landing-page palette. The same token names as :root, currently rebound to
+ * the same editorial paper/ink scale as :root itself (both ported from the
+ * Airfare-CPI reference), kept as its own scope in case the landing page and
+ * dashboard diverge again later. Every shared component (Button, Card,
+ * Badge) renders in it unchanged and no second design system appears.
  *
  * Hues are deliberately NOT rebound here -- --chart-*, --success, --warning
  * and --destructive inherit from :root, which is the rule that keeps colour
@@ -194,43 +206,43 @@
  * so interaction has no accent hue of its own.
  */
 .landing-theme {
-  --background: #fbfbfa;
-  --foreground: #17181a;
+  --background: #f7f5f0;
+  --foreground: #191917;
 
-  --card: #ffffff;
-  --card-foreground: #17181a;
+  --card: #fffdf8;
+  --card-foreground: #191917;
 
-  --popover: #ffffff;
-  --popover-foreground: #17181a;
+  --popover: #fffdf8;
+  --popover-foreground: #191917;
 
-  --primary: #17181a;
-  --primary-foreground: #fbfbfa;
+  --primary: #191917;
+  --primary-foreground: #f7f5f0;
 
-  --secondary: #f1f1ef;
-  --secondary-foreground: #4a4d52;
+  --secondary: #efece3;
+  --secondary-foreground: #4a4a45;
 
-  --muted: #f1f1ef;
-  --muted-foreground: #5c6066;
+  --muted: #efece3;
+  --muted-foreground: #77746d;
 
-  --accent: #ecece9;
-  --accent-foreground: #17181a;
+  --accent: #e6eee5;
+  --accent-foreground: #191917;
 
-  --border: rgba(23, 24, 26, 0.1);
-  --input: rgba(23, 24, 26, 0.1);
-  --ring: #17181a;
+  --border: rgba(25, 25, 23, 0.13);
+  --input: rgba(25, 25, 23, 0.13);
+  --ring: #191917;
 
-  --radius: 7px;
+  --radius: 0px;
 
   /* Extra steps the globe's lit-ocean gradient needs: :root has --border but
      no stronger rule, and no surface between --card and --background. */
-  --rule-strong: #cfcfcb;
-  --surface-2: #f5f5f3;
-  --warn-fill: #d9a22b;
+  --rule-strong: #cfc9ba;
+  --surface-2: #efece3;
+  --warn-fill: #b27a31;
 
   /* Secondary ink -- the H1's qualifier clause and nav rest state. Between
      --foreground and --muted-foreground, which is a step :root has no token
      for, so it is named rather than inlined as a hex in the JSX. */
-  --ink-2: #4a4d52;
+  --ink-2: #4a4a45;
 }
 
 /*
@@ -242,35 +254,35 @@
  */
 .dark .landing-theme,
 .landing-theme.dark {
-  --background: #0c0d0e;
-  --foreground: #f2f2f0;
+  --background: #151815;
+  --foreground: #f3f1e9;
 
-  --card: #141517;
-  --card-foreground: #f2f2f0;
+  --card: #1c211d;
+  --card-foreground: #f3f1e9;
 
-  --popover: #141517;
-  --popover-foreground: #f2f2f0;
+  --popover: #1c211d;
+  --popover-foreground: #f3f1e9;
 
-  --primary: #f2f2f0;
-  --primary-foreground: #0c0d0e;
+  --primary: #f3f1e9;
+  --primary-foreground: #151815;
 
-  --secondary: #1b1c1e;
-  --secondary-foreground: #c8c8c4;
+  --secondary: #20251f;
+  --secondary-foreground: #c8c6bd;
 
-  --muted: #1b1c1e;
-  --muted-foreground: #9a9da2;
+  --muted: #20251f;
+  --muted-foreground: #aaa9a0;
 
-  --accent: #222325;
-  --accent-foreground: #f2f2f0;
+  --accent: #25352b;
+  --accent-foreground: #f3f1e9;
 
-  --border: rgba(242, 242, 240, 0.12);
-  --input: rgba(242, 242, 240, 0.12);
-  --ring: #9a9da2;
+  --border: rgba(255, 255, 255, 0.15);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #aaa9a0;
 
-  --ink-2: #c8c8c4;
-  --rule-strong: #383b3f;
-  --surface-2: #1b1d1f;
-  --warn-fill: #e3a33f;
+  --ink-2: #c8c6bd;
+  --rule-strong: #3a3f39;
+  --surface-2: #20251f;
+  --warn-fill: #fbbf24;
 }
 
 /* Hero: copy column capped at 48% of the row, visual takes the rest. Stacks
@@ -279,9 +291,18 @@
    site, and the globe's lit ocean only reads against a dark ground. */
 .landing-hero {
   background: var(--surface-2);
-  border-bottom: 1px solid var(--border);
   overflow: hidden;
   min-height: clamp(420px, 62vh, 620px);
+}
+
+/* Smooths the hard cut from the hero's always-dark panel into the page's
+   real theme background below it. --page-bg is captured once on the
+   outermost (un-forced) .landing-theme wrapper, so it still resolves to the
+   light OR dark background depending on the site's actual theme, even
+   though this element sits inside the hero's forced `.dark` scope. */
+.landing-hero-fade {
+  height: 88px;
+  background: linear-gradient(to bottom, var(--surface-2), var(--page-bg));
 }
 
 .landing-globe {
@@ -359,7 +380,7 @@
 .lc-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 11px;
+  border-radius: 0;
   padding: 22px 24px;
   min-width: 0;
 }
@@ -369,7 +390,7 @@
   grid-template-columns: minmax(270px, 320px) 1fr;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 11px;
+  border-radius: 0;
   overflow: hidden;
 }
 .lc-panel-l {
@@ -427,9 +448,9 @@
 
 .lc-card-h { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 14px; }
 
-.lc-seg { display: flex; background: var(--surface-2); border-radius: 8px; padding: 3px; gap: 3px; }
+.lc-seg { display: flex; background: var(--surface-2); border-radius: 999px; padding: 3px; gap: 3px; }
 .lc-seg button {
-  background: none; border: 0; padding: 8px 14px; min-height: 36px; border-radius: 6px;
+  background: none; border: 0; padding: 8px 14px; min-height: 36px; border-radius: 999px;
   cursor: pointer; font-size: 13px; color: var(--muted-foreground); font-weight: 500;
 }
 .lc-seg button:hover { color: var(--ink-2); }
@@ -445,7 +466,7 @@
   gap: 1px;
   background: var(--border);
   border: 1px solid var(--border);
-  border-radius: 11px;
+  border-radius: 0;
   overflow: hidden;
 }
 .lc-stat { background: var(--card); padding: 18px 20px; display: flex; flex-direction: column; gap: 3px; }
@@ -463,7 +484,7 @@
 .lc-g2 { display: grid; gap: 14px; grid-template-columns: 1.32fr 1fr; }
 
 .lc-code {
-  margin: 0; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+  margin: 0; background: var(--surface-2); border: 1px solid var(--border); border-radius: 0;
   padding: 15px 17px; font-family: var(--font-mono); font-size: 11.5px; line-height: 1.75;
   overflow-x: auto; color: var(--ink-2);
 }
@@ -478,4 +499,409 @@
   .lc-panel { grid-template-columns: 1fr; }
   .lc-panel-l { border-right: 0; border-bottom: 1px solid var(--border); }
   .lc-g2 { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   Data-mode banner / chip (DataModeBanner.jsx)
+   Ported from the Airfare-CPI reference. Not yet used by any page -- these
+   rules are inert until a component renders .data-mode-*. Colors are kept
+   literal to the source rather than remapped onto --success/--warning/
+   --destructive, since this is a deliberately separate, unmissable
+   vocabulary from the rest of the chrome.
+   ============================================================ */
+.data-mode-banner {
+  padding: 10px 20px;
+  border-bottom: 1px solid;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+.data-mode-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.data-mode-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+}
+.data-mode-detail {
+  flex: 1 1 340px;
+  min-width: 0;
+  opacity: 0.92;
+}
+.data-mode-suppression {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 1400px;
+  margin: 8px auto 0;
+  padding: 8px 12px;
+  border: 1px solid rgba(179, 38, 30, 0.4);
+  background: rgba(179, 38, 30, 0.08);
+  font-size: 12px;
+}
+
+/* Live: collected data. Green, but still explicit. */
+.data-mode-live {
+  background: rgba(27, 107, 58, 0.09);
+  border-bottom-color: rgba(27, 107, 58, 0.4);
+}
+.data-mode-live .data-mode-label { color: #14663a; }
+
+/* Simulated and offline share an amber treatment: both mean "not measured". */
+.data-mode-simulated,
+.data-mode-offline {
+  background: rgba(217, 119, 6, 0.1);
+  border-bottom-color: rgba(217, 119, 6, 0.45);
+}
+.data-mode-simulated .data-mode-label,
+.data-mode-offline .data-mode-label { color: #b45309; }
+
+/* Unavailable: red, because there is nothing to show. */
+.data-mode-unavailable {
+  background: rgba(179, 38, 30, 0.09);
+  border-bottom-color: rgba(179, 38, 30, 0.45);
+}
+.data-mode-unavailable .data-mode-label { color: #b3261e; }
+
+.dark .data-mode-live { background: rgba(52, 199, 123, 0.12); }
+.dark .data-mode-live .data-mode-label { color: #4ade80; }
+.dark .data-mode-simulated,
+.dark .data-mode-offline { background: rgba(251, 191, 36, 0.12); }
+.dark .data-mode-simulated .data-mode-label,
+.dark .data-mode-offline .data-mode-label { color: #fbbf24; }
+.dark .data-mode-unavailable { background: rgba(248, 113, 113, 0.13); }
+.dark .data-mode-unavailable .data-mode-label { color: #f87171; }
+
+@media print {
+  .data-mode-banner {
+    border: 2px solid #000;
+    background: #fff;
+  }
+}
+
+/* Inline chip, same vocabulary as the banner. */
+.data-mode-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid;
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.data-mode-chip-live {
+  color: #14663a;
+  border-color: rgba(27, 107, 58, 0.35);
+  background: rgba(27, 107, 58, 0.08);
+}
+.data-mode-chip-simulated,
+.data-mode-chip-offline {
+  color: #b45309;
+  border-color: rgba(217, 119, 6, 0.35);
+  background: rgba(217, 119, 6, 0.08);
+}
+.data-mode-chip-unavailable {
+  color: #b3261e;
+  border-color: rgba(179, 38, 30, 0.35);
+  background: rgba(179, 38, 30, 0.08);
+}
+
+/* ============================================================
+   NetworkMap.jsx -- animated India corridor map
+   Ported from the Airfare-CPI reference (satellite basemap + canvas beacon
+   animation), retokened onto our own palette (--card/--foreground/--success
+   instead of their --paper/--ink/--green) and sharpened to match the rest
+   of the app's flat, hairline-bordered, zero-radius chrome.
+   ============================================================ */
+.netmap-card {
+  background: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.netmap-telemetry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  z-index: 4;
+  position: relative;
+}
+
+.netmap-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  border: 1px solid var(--border);
+}
+.netmap-pill strong {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--success);
+  font-family: var(--font-mono);
+}
+
+.netmap-coords {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+}
+
+.netmap-engine-tag {
+  font-size: 10px;
+  padding: 2px 8px;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+}
+
+.netmap-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1024 / 935;
+  max-height: 720px;
+  margin: 0 auto;
+  overflow: hidden;
+  user-select: none;
+  background-color: #040913;
+}
+
+.netmap-vignette {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 80px 24px rgba(4, 9, 19, 0.75);
+  pointer-events: none;
+}
+
+.netmap-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 10px var(--success);
+  animation: netmapBeaconPulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.netmap-console {
+  padding: 16px 20px;
+}
+
+.netmap-corridor-eyebrow {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--success);
+  font-family: var(--font-mono);
+  margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.netmap-corridor-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--foreground);
+  font-family: var(--font-serif);
+  letter-spacing: -0.02em;
+}
+
+.netmap-status-pill {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  background: var(--accent);
+  color: var(--success);
+  border: 1px solid var(--border);
+}
+.netmap-status-pill.is-missing {
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.netmap-stat-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: var(--font-mono);
+  margin-bottom: 2px;
+}
+.netmap-stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--foreground);
+}
+.netmap-stat-value.is-green { color: var(--success); }
+
+.netmap-filter-btn,
+.netmap-chip-btn {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  white-space: nowrap;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
+  transition: all 0.15s ease;
+}
+.netmap-filter-btn:hover,
+.netmap-chip-btn:hover {
+  background: var(--accent);
+  color: var(--foreground);
+}
+.netmap-filter-btn[data-active="true"],
+.netmap-chip-btn[data-active="true"] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+}
+
+@keyframes netmapBeaconPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.35); opacity: 0.6; }
+}
+
+@media (max-width: 768px) {
+  .netmap-telemetry { padding: 8px 12px; }
+  .netmap-console { padding: 12px 14px; }
+}
+@media (max-width: 600px) {
+  .netmap-telemetry strong { font-size: 9.5px; }
+  .netmap-viewport { aspect-ratio: 896 / 1200; }
+}
+
+/* Two-column layout wrapping NetworkMap: the map stays contained to its own
+   aspect ratio in the wider column instead of stretching full-bleed, with a
+   real-data "basket volume" sidebar beside it -- matching the Airfare-CPI
+   reference's .network-layout / .network-notes pattern. */
+.netmap-layout {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 18px;
+  align-items: stretch;
+}
+.netmap-layout .netmap-card { height: fit-content; }
+
+.netmap-notes {
+  border: 1px solid var(--border);
+  background: var(--card);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.netmap-note-figure {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 18px;
+}
+.netmap-note-figure strong {
+  font-family: var(--font-serif);
+  font-size: 44px;
+  font-weight: 500;
+  display: block;
+  line-height: 1;
+  margin-bottom: 5px;
+  color: var(--foreground);
+}
+.netmap-note-figure p {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.netmap-ranking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.netmap-ranking-header .eyebrow {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+}
+.netmap-ranking-header .tag {
+  font-size: 10px;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+}
+
+.netmap-hub-row {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+}
+.netmap-hub-row:last-child { border-bottom: 0; }
+.netmap-hub-row > span:first-child {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.netmap-hub-row strong {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--foreground);
+}
+.netmap-hub-row small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.netmap-hub-share {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--success);
+  background: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+@media (max-width: 900px) {
+  .netmap-layout { grid-template-columns: 1fr; }
 }
