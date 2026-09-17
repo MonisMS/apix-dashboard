@@ -29,7 +29,7 @@ export default function Carriers() {
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
         <Paper>
-          <Title order={4} mb={4}>Share of observed offers</Title>
+          <Title order={2} mb={4}>Share of observed offers</Title>
           <Text size="xs" c="dimmed" mb="md">Describes our sample, not the market</Text>
           <Group justify="center">
             <DonutChart size={200} thickness={26} data={donut} withTooltip
@@ -38,7 +38,7 @@ export default function Carriers() {
         </Paper>
 
         <Paper p={0}>
-          <Title order={4} p="lg" pb="sm">Carrier indices</Title>
+          <Title order={2} p="lg" pb="sm">Carrier indices</Title>
           {/* A 7-column table does not fit a phone. Scroll the table,
               not the page. */}
           <Table.ScrollContainer minWidth={1150}>

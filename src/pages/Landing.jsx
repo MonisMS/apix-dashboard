@@ -264,6 +264,7 @@ export default function Landing() {
             <nav aria-label="Primary" className="hidden lg:flex">
               <Link
                 to="/overview"
+                data-tour="nav-dashboard"
                 className="inline-flex items-center gap-1.5 text-[14.5px] font-medium text-foreground hover:text-muted-foreground"
               >
                 <LayoutDashboard className="h-4 w-4" aria-hidden="true" /> Dashboard
@@ -338,7 +339,6 @@ export default function Landing() {
                 asChild
                 variant="outline"
                 className="h-11 rounded-[7px] border-[var(--rule-strong)] bg-transparent px-5 text-[14.5px] font-medium shadow-none"
-                data-tour="cta-dashboard"
               >
                 <Link to="/methodology">
                   <TrendingUp className="h-[15px] w-[15px]" aria-hidden="true" /> See the price surface

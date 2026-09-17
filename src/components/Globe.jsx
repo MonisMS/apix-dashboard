@@ -45,7 +45,7 @@ function facing(lon, lat, cLon, cLat) {
   return Math.sin(p0) * Math.sin(p) + Math.cos(p0) * Math.cos(p) * Math.cos(l);
 }
 
-export function Globe({ className }) {
+export function Globe({ className, ...rest }) {
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
   const worldRef = useRef(null);
@@ -316,6 +316,7 @@ export function Globe({ className }) {
       role="img"
       aria-label="Rotating globe showing the twelve basket air routes across India"
       style={{ position: 'relative', cursor: 'grab', touchAction: 'pan-y' }}
+      {...rest}
     >
       <canvas ref={canvasRef} aria-hidden="true" style={{ width: '100%', height: '100%', display: 'block' }} />
     </div>

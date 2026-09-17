@@ -18,7 +18,7 @@ const AXIS = 'var(--muted-foreground)';
 function TooltipBox({ active, payload, label, valueFormatter }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-md border border-border bg-popover p-2 text-xs shadow-sm">
+    <div className="rounded-none border border-border bg-popover p-2 text-xs shadow-none">
       <div className="mb-1 font-medium text-popover-foreground">{label}</div>
       {payload.map((p) => (
         <div key={p.dataKey} className="flex items-center gap-2 text-muted-foreground">

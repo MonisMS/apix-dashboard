@@ -153,6 +153,7 @@ export function NetworkMap({ routes = [] }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let animId;
     const VB_W = 1024;
@@ -180,8 +181,10 @@ export function NetworkMap({ routes = [] }) {
     }).filter(Boolean);
 
     const render = () => {
-      time += 0.016;
-      mainProgress = (mainProgress + 0.005) % 1;
+      if (!reduceMotion) {
+        time += 0.016;
+        mainProgress = (mainProgress + 0.005) % 1;
+      }
 
       const rect = canvas.getBoundingClientRect();
       const scaleX = rect.width / VB_W;
@@ -256,7 +259,7 @@ export function NetworkMap({ routes = [] }) {
         });
       }
 
-      animId = requestAnimationFrame(render);
+      if (!reduceMotion) animId = requestAnimationFrame(render);
     };
     animId = requestAnimationFrame(render);
 
@@ -312,7 +315,7 @@ export function NetworkMap({ routes = [] }) {
                 textAnchor="middle"
                 fill={isDarkMode ? 'rgba(255, 255, 255, 0.42)' : 'rgba(25, 25, 23, 0.55)'}
                 fontSize={8.5}
-                fontWeight={700}
+                fontWeight={500}
                 letterSpacing="0.14em"
                 fontFamily="var(--font-mono)"
                 style={{ textShadow: isDarkMode ? '0 1px 4px rgba(0,0,0,0.9)' : '0 1px 3px rgba(255,255,255,0.9)' }}
@@ -325,17 +328,34 @@ export function NetworkMap({ routes = [] }) {
             {HUBS_CONFIG.map((hub) => {
               const isActive = hub.code === activeFrom || hub.code === activeTo;
               const offset = hub.labelOffset || { x: 14, y: 4 };
+              const match = BASKET_ROUTES.find((r) => r.from === hub.code || r.to === hub.code);
+              const selectMatch = () => {
+                if (match) setSelected(match);
+              };
               return (
                 <g
                   key={hub.code}
                   transform={`translate(${hub.x}, ${hub.y})`}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: match ? 'pointer' : 'default', outline: 'none' }}
+                  className="netmap-hub-marker"
                   onMouseEnter={() => setHoveredHub(hub)}
                   onMouseLeave={() => setHoveredHub(null)}
-                  onClick={() => {
-                    const match = BASKET_ROUTES.find((r) => r.from === hub.code || r.to === hub.code);
-                    if (match) setSelected(match);
-                  }}
+                  onClick={selectMatch}
+                  {...(match
+                    ? {
+                        role: 'button',
+                        tabIndex: 0,
+                        'aria-label': `Inspect the ${hub.city} (${hub.code}) corridor`,
+                        onFocus: () => setHoveredHub(hub),
+                        onBlur: () => setHoveredHub(null),
+                        onKeyDown: (e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            selectMatch();
+                          }
+                        },
+                      }
+                    : { 'aria-hidden': true })}
                   data-testid={`network-map-hub-${hub.code.toLowerCase()}`}
                 >
                   {isActive && (
@@ -346,7 +366,7 @@ export function NetworkMap({ routes = [] }) {
                     fill={isActive ? nodeColor : isDarkMode ? 'rgba(154, 195, 160, 0.65)' : 'rgba(59, 109, 77, 0.7)'}
                     stroke="#ffffff"
                     strokeWidth={isActive ? 2.4 : 1.5}
-                    style={{ filter: isActive ? `drop-shadow(0 0 10px ${nodeColor})` : 'none', transition: 'all 0.2s ease' }}
+                    style={{ filter: isActive ? `drop-shadow(0 0 10px ${nodeColor})` : 'none', transition: 'filter 0.2s ease, stroke-width 0.2s ease' }}
                   />
                   <circle r={isActive ? 2.8 : 1.8} fill={isDarkMode ? '#050B14' : '#ffffff'} />
                   <g transform={`translate(${offset.x}, ${offset.y})`}>
@@ -355,9 +375,9 @@ export function NetworkMap({ routes = [] }) {
                       fill={isActive ? (isDarkMode ? '#9ac3a0' : '#191917') : badgeBg}
                       stroke={isActive ? '#ffffff' : isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)'}
                       strokeWidth={isActive ? 1.4 : 0.8}
-                      style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.5))', transition: 'all 0.2s ease' }}
+                      style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.5))', transition: 'filter 0.2s ease, fill 0.2s ease, stroke 0.2s ease' }}
                     />
-                    <text x={12} y={1} textAnchor="middle" fill={isActive ? (isDarkMode ? '#050B14' : '#ffffff') : badgeTextColor} fontSize={9.5} fontWeight={isActive ? 800 : 700} fontFamily="var(--font-mono)">
+                    <text x={12} y={1} textAnchor="middle" fill={isActive ? (isDarkMode ? '#050B14' : '#ffffff') : badgeTextColor} fontSize={9.5} fontWeight={500} fontFamily="var(--font-mono)">
                       {hub.code}
                     </text>
                   </g>

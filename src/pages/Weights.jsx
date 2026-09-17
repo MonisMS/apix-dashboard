@@ -34,7 +34,7 @@ export default function Weights() {
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
         <Paper>
-          <Title order={4} mb="md">Weight by route</Title>
+          <Title order={2} mb="md">Weight by route</Title>
           <Group justify="center">
             <DonutChart size={210} thickness={28} data={donut} withTooltip
                         tooltipDataSource="segment" chartLabel="basket"
@@ -45,7 +45,7 @@ export default function Weights() {
         <Card>
           <Group gap="sm" mb="sm">
             <IconScale size={20} aria-hidden="true" />
-            <Title order={4}>Where airfare sits in the CPI</Title>
+            <Title order={2}>Where airfare sits in the CPI</Title>
           </Group>
           {/* A 4-column table does not fit a phone. Scroll the table,
               not the page. */}
@@ -77,7 +77,7 @@ export default function Weights() {
       </SimpleGrid>
 
       <Paper p={0}>
-        <Title order={4} p="lg" pb="sm">Route weights</Title>
+        <Title order={2} p="lg" pb="sm">Route weights</Title>
         <Table.ScrollContainer minWidth={720}>
           <Table striped verticalSpacing="sm" horizontalSpacing="lg">
             <Table.Thead>
@@ -103,7 +103,7 @@ export default function Weights() {
       </Paper>
 
       <Paper>
-        <Title order={4} mb="sm">Lead-time weights</Title>
+        <Title order={2} mb="sm">Lead-time weights</Title>
         <Text size="sm" c="dimmed">{d.provenance.lead.method}</Text>
         <Group mt="md" gap="xs">
           {Object.entries(d.provenance.lead.weights).map(([lead, w]) => (

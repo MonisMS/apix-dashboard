@@ -37,7 +37,7 @@ export default function Cleaning() {
       </Alert>
 
       <Paper>
-        <Title order={4} mb={4}>What each screening rule does to the published number</Title>
+        <Title order={2} mb={4}>What each screening rule does to the published number</Title>
         <Text size="xs" c="dimmed" mb="md">
           Choosing a screening rule without showing its effect is how a cleaning step
           quietly becomes an editorial one.
@@ -90,7 +90,7 @@ export default function Cleaning() {
         <Card>
           <Group gap="sm" mb="sm">
             <IconFilter size={20} aria-hidden="true" />
-            <Title order={4}>The rules</Title>
+            <Title order={2}>The rules</Title>
           </Group>
           <Text size="sm" fw={600}>Hard bound — on</Text>
           <Text size="sm" c="dimmed">{d.hard_bound.description}</Text>
@@ -103,7 +103,7 @@ export default function Cleaning() {
         </Card>
 
         <Paper p={0}>
-          <Title order={4} p="lg" pb="sm">By collection day</Title>
+          <Title order={2} p="lg" pb="sm">By collection day</Title>
           {/* A 6-column table does not fit a phone. Scroll the table,
               not the page. */}
           <Table.ScrollContainer minWidth={1060}>
@@ -135,7 +135,7 @@ export default function Cleaning() {
 
       {d.flags?.length > 0 && (
         <Paper p={0}>
-          <Title order={4} p="lg" pb="sm">Flagged observations</Title>
+          <Title order={2} p="lg" pb="sm">Flagged observations</Title>
           <Text size="xs" c="dimmed" px="lg" pb="sm">
             Quarantined from the matched sample. Still in the database, never deleted.
           </Text>

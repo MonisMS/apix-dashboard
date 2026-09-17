@@ -38,7 +38,7 @@ export default function Windows() {
       </Alert>
 
       <Paper>
-        <Title order={4} mb={4}>Index by advance-purchase window</Title>
+        <Title order={2} mb={4}>Index by advance-purchase window</Title>
         <Text size="xs" c="dimmed" mb="md">
           All five share the headline's reference, so they are directly comparable
         </Text>
@@ -55,7 +55,7 @@ export default function Windows() {
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
         <Paper>
-          <Title order={4} mb={4}>Lead-time curve</Title>
+          <Title order={2} mb={4}>Lead-time curve</Title>
           <Text size="xs" c="dimmed" mb="md">Mean observed fare by how far ahead the seat was priced</Text>
           <BarChart
             h={260} data={elasticity} dataKey="window"
@@ -65,7 +65,7 @@ export default function Windows() {
         </Paper>
 
         <Paper p={0}>
-          <Title order={4} p="lg" pb="sm">Windows</Title>
+          <Title order={2} p="lg" pb="sm">Windows</Title>
           {/* A 6-column table does not fit a phone. Scroll the table,
               not the page. */}
           <Table.ScrollContainer minWidth={1060}>

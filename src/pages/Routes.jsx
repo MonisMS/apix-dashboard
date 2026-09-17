@@ -38,7 +38,7 @@ export default function Routes() {
       )}
 
       <Paper>
-        <Title order={4} mb="md">Basket weight by route</Title>
+        <Title order={2} mb="md">Basket weight by route</Title>
         <BarChart
           h={280} data={weightChart} dataKey="route"
           series={[{ name: 'Basket weight %', color: 'indigo.6' }]}

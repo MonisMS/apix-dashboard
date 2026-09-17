@@ -98,7 +98,7 @@ export function RouteMap({ airports, routes: routeCodes, className }) {
 
       {hover && byPair.get(hover) && (
         <div
-          className="pointer-events-none absolute left-3 top-3 rounded-md border border-border bg-popover p-3 text-xs shadow-sm"
+          className="pointer-events-none absolute left-3 top-3 rounded-none border border-border bg-popover p-3 text-xs shadow-none"
         >
           {(() => {
             const r = byPair.get(hover);

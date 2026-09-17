@@ -65,7 +65,7 @@ export default function Heatmap() {
       <Paper>
         <Group justify="space-between" mb="lg">
           <div>
-            <Title order={4}>Route × day</Title>
+            <Title order={2}>Route × day</Title>
             <Text size="xs" c="dimmed">
               {signed
                 ? 'Red is a fall, green is a rise, scaled symmetrically around zero'

@@ -29,7 +29,7 @@ export default function Validation() {
       </Alert>
 
       <Paper>
-        <Title order={4} mb={4}>MoSPI published Airfare index</Title>
+        <Title order={2} mb={4}>MoSPI published Airfare index</Title>
         <Text size="xs" c="dimmed" mb="md">
           {d.mospi.source} · {d.mospi.frequency} · {d.mospi.base} · {d.mospi.n_points} points
           ({d.mospi.first} to {d.mospi.last})
@@ -48,7 +48,7 @@ export default function Validation() {
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
         <Card>
-          <Title order={4} mb={4}>Pass criteria, fixed in advance</Title>
+          <Title order={2} mb={4}>Pass criteria, fixed in advance</Title>
           <Text size="xs" c="dimmed" mb="md">{h.criteria_note}</Text>
           {/* A 4-column table does not fit a phone. Scroll the table,
               not the page. */}
@@ -86,7 +86,7 @@ export default function Validation() {
           <Group gap="sm" mb="sm">
             <IconCircleCheck size={20}
               color={h.harness_works ? 'var(--mantine-color-teal-6)' : 'var(--mantine-color-red-6)'} />
-            <Title order={4}>The harness proves its own arithmetic</Title>
+            <Title order={2}>The harness proves its own arithmetic</Title>
           </Group>
           <Text size="xs" c="dimmed" mb="md">
             The metrics run on cases whose answers are known, every time. A harness that
@@ -125,7 +125,7 @@ export default function Validation() {
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
         <Card>
-          <Title order={4} mb="sm">When a real answer first exists</Title>
+          <Title order={2} mb="sm">When a real answer first exists</Title>
           <Table variant="vertical" withTableBorder={false}>
             <Table.Tbody>
               <Table.Tr>
@@ -154,7 +154,7 @@ export default function Validation() {
         <Card>
           <Group gap="sm" mb="sm">
             <IconCircleCheck size={20} color="var(--mantine-color-teal-6)" />
-            <Title order={4}>What we can show instead</Title>
+            <Title order={2}>What we can show instead</Title>
           </Group>
           <List size="sm" spacing="xs">
             {(d.overlap.what_we_can_show_instead ?? []).map((s) => (
@@ -164,7 +164,7 @@ export default function Validation() {
         </Card>
 
         <Card>
-          <Title order={4} mb="sm">Transitivity audit</Title>
+          <Title order={2} mb="sm">Transitivity audit</Title>
           <Table variant="vertical" withTableBorder={false}>
             <Table.Tbody>
               <Table.Tr>
@@ -191,7 +191,7 @@ export default function Validation() {
 
       {h.seasonal_context?.n_years > 0 && (
         <Paper>
-          <Title order={4} mb={4}>The one piece of evidence available now</Title>
+          <Title order={2} mb={4}>The one piece of evidence available now</Title>
           <Text size="xs" c="dimmed" mb="md">
             MoSPI&rsquo;s own history for this calendar month, against what APIx is doing
           </Text>
@@ -212,7 +212,7 @@ export default function Validation() {
       )}
 
       <Paper p={0}>
-        <Title order={4} p="lg" pb="sm">Item match rate by day</Title>
+        <Title order={2} p="lg" pb="sm">Item match rate by day</Title>
         {/* A 6-column table does not fit a phone. Scroll the table,
             not the page. */}
         <Table.ScrollContainer minWidth={1060}>

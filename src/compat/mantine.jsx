@@ -129,7 +129,7 @@ export function Code({ block, children, className, style, ...rest }) {
   return (
     <Tag
       className={cn(
-        'font-mono text-xs rounded-md bg-muted text-foreground',
+        'font-mono text-xs rounded-none bg-muted text-foreground',
         block ? 'block overflow-x-auto p-3 whitespace-pre-wrap' : 'px-1.5 py-0.5',
         className,
       )}
@@ -153,7 +153,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-md font-semibold whitespace-nowrap',
+        'inline-flex items-center gap-1 rounded-full font-semibold whitespace-nowrap',
         size === 'xs' ? 'text-[10px] px-1.5 py-0.5' : 'text-[11px] px-2 py-0.5',
         className,
       )}
@@ -174,7 +174,7 @@ export function Alert({ color = 'navy', title, icon, children, className, style,
   return (
     <div
       role="alert"
-      className={cn('rounded-md border border-border p-4', className)}
+      className={cn('rounded-none border border-border p-4', className)}
       style={{ ...soft, ...s, ...style }}
       {...r}
     >
@@ -193,7 +193,7 @@ export function Paper({ children, p = 'lg', className, style, ...rest }) {
   const { style: s, rest: r } = splitProps(rest);
   return (
     <div
-      className={cn('rounded-md border border-border bg-card text-card-foreground', className)}
+      className={cn('rounded-none border border-border bg-card text-card-foreground', className)}
       style={{ padding: p === 0 ? 0 : undefined, ...boxStyle({ p: p === 0 ? 0 : 'lg' }), ...s, ...style }}
       {...r}
     >
@@ -206,7 +206,7 @@ export function Card({ children, p = 'lg', withBorder = true, className, style, 
   const { style: s, rest: r } = splitProps(rest);
   return (
     <div
-      className={cn('rounded-md bg-card text-card-foreground', withBorder && 'border border-border', className)}
+      className={cn('rounded-none bg-card text-card-foreground', withBorder && 'border border-border', className)}
       style={{ ...boxStyle({ p }), ...s, ...style }}
       {...r}
     >
@@ -226,7 +226,7 @@ export function ScrollArea({ children, className, style, ...rest }) {
 export function Skeleton({ height = 20, className, style }) {
   return (
     <div
-      className={cn('animate-pulse rounded-md bg-muted', className)}
+      className={cn('animate-pulse rounded-none bg-muted', className)}
       style={{ height, ...style }}
     />
   );
@@ -240,7 +240,9 @@ export function Button({ children, variant = 'filled', size, onClick, className,
       type="button"
       onClick={onClick}
       className={cn(
-        'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors',
+        'inline-flex items-center justify-center rounded-none text-sm font-medium',
+        'transition-[background-color,color,transform] duration-150 active:scale-[0.97]',
+        'outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-1 focus-visible:ring-offset-background',
         size === 'compact-sm' ? 'h-7 px-2 text-xs' : 'h-9 px-3',
         isSubtle
           ? 'text-primary hover:bg-accent'
@@ -268,7 +270,19 @@ List.Item = function ListItem({ children }) {
 };
 
 export function Progress({ children }) {
-  return <div className="flex h-2 w-full overflow-hidden rounded-full bg-muted">{children}</div>;
+  const child = React.Children.count(children) === 1 ? React.Children.only(children) : null;
+  const value = child?.props?.value;
+  return (
+    <div
+      className="flex h-2 w-full overflow-hidden rounded-full bg-muted"
+      role="progressbar"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={typeof value === 'number' ? Math.round(value) : undefined}
+    >
+      {children}
+    </div>
+  );
 }
 Progress.Root = Progress;
 Progress.Section = function ProgressSection({ value, color = 'teal' }) {
@@ -288,7 +302,7 @@ export function Tooltip({ label, children }) {
 export function SegmentedControl({ value, onChange, data = [], size, className, ...rest }) {
   return (
     <div
-      className={cn('inline-flex rounded-md border border-border bg-muted p-0.5 text-xs', className)}
+      className={cn('inline-flex rounded-full border border-border bg-muted p-0.5 text-xs', className)}
       role="group"
       {...rest}
     >
@@ -300,10 +314,12 @@ export function SegmentedControl({ value, onChange, data = [], size, className, 
           <button
             key={optValue}
             type="button"
+            aria-pressed={active}
             onClick={() => onChange?.(optValue)}
             className={cn(
-              'rounded-[5px] px-2.5 py-1 font-medium transition-colors',
-              active ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+              'rounded-full px-2.5 py-1 font-medium transition-colors',
+              'outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+              active ? 'bg-card text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground',
             )}
           >
             {optLabel}
@@ -329,7 +345,7 @@ export function Table({ children, striped, layout, className, style, ...rest }) 
   );
 }
 Table.Thead = function Thead({ children }) {
-  return <thead className="border-b border-border text-left text-xs text-muted-foreground">{children}</thead>;
+  return <thead className="border-b border-border text-left">{children}</thead>;
 };
 Table.Tbody = function Tbody({ children }) {
   return <tbody>{children}</tbody>;
@@ -349,7 +365,11 @@ Table.Tr = function Tr({ children, onClick, style, bg, ...rest }) {
 Table.Th = function Th({ children, ta, w, className, style, ...rest }) {
   return (
     <th
-      className={cn('py-2 pr-3 font-medium', ta === 'right' && 'text-right', className)}
+      className={cn(
+        'py-2 pr-3 font-mono text-[11px] font-medium uppercase tracking-wider text-muted-foreground',
+        ta === 'right' && 'text-right',
+        className,
+      )}
       style={{ width: typeof w === 'number' ? `${w}px` : w, ...style }}
       {...rest}
     >
@@ -400,6 +420,7 @@ Tabs.Tab = function TabsTab({ value, children, onClick, ...rest }) {
       }}
       className={cn(
         '-mb-px border-b-2 px-3 py-2 text-sm font-medium transition-colors',
+        'outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
         active ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground',
         disabled && 'cursor-not-allowed opacity-50',
       )}

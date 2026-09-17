@@ -28,7 +28,7 @@ export function PageHeader({ title, description, badges = [] }) {
 
 export function Section({ title, description, aside, flush, children, className }) {
   return (
-    <div className={cn('rounded-md border border-border bg-card p-6', flush && 'p-0', className)}>
+    <div className={cn('rounded-none border border-border bg-card p-6', flush && 'p-0', className)}>
       {(title || description || aside) && (
         <div className={cn('mb-4 flex flex-wrap items-start justify-between gap-3', flush && 'p-6 pb-2 mb-0')}>
           <div>
@@ -89,9 +89,9 @@ export function queryState(...queries) {
     return (
       <div className="flex flex-col gap-4" aria-busy="true" aria-live="polite">
         <span className="sr-only">Loading…</span>
-        <Skeleton className="h-[72px] w-full rounded-md" />
-        <Skeleton className="h-[280px] w-full rounded-md" />
-        <Skeleton className="h-[180px] w-full rounded-md" />
+        <Skeleton className="h-[72px] w-full rounded-none" />
+        <Skeleton className="h-[280px] w-full rounded-none" />
+        <Skeleton className="h-[180px] w-full rounded-none" />
       </div>
     );
   }

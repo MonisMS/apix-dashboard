@@ -56,7 +56,7 @@ export default function IndexDetail() {
             </Alert>
 
             <Paper>
-              <Title order={4} mb="md">Daily series</Title>
+              <Title order={2} mb="md">Daily series</Title>
               <LineChart
                 h={320} data={chart} dataKey="date" curveType="natural" withDots
                 series={[{ name: 'APIx', color: 'indigo.6' }]}
@@ -67,7 +67,7 @@ export default function IndexDetail() {
             </Paper>
 
             <Paper p={0}>
-              <Title order={4} p="lg" pb="sm">Every published point</Title>
+              <Title order={2} p="lg" pb="sm">Every published point</Title>
               <Table.ScrollContainer minWidth={980}>
                 <Table striped verticalSpacing="sm" horizontalSpacing="lg">
                   <Table.Thead>
@@ -114,7 +114,7 @@ export default function IndexDetail() {
             </Paper>
 
             <Paper>
-              <Title order={4} mb="sm">Transitivity audit</Title>
+              <Title order={2} mb="sm">Transitivity audit</Title>
               <Group gap="xl">
                 <div>
                   <Text size="xs" c="dimmed">Chained</Text>

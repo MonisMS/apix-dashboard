@@ -38,7 +38,7 @@ export default function Tariffs() {
           <Card key={airline}>
             <Group gap="sm" mb="xs">
               <IconReceipt2 size={20} aria-hidden="true" />
-              <Title order={4}>{airline}</Title>
+              <Title order={2}>{airline}</Title>
             </Group>
             <Text size="xs" c="dimmed">Found via {src.found_via}</Text>
             <Anchor href={src.url} target="_blank" rel="noopener noreferrer" size="xs" mt="xs"
@@ -51,7 +51,7 @@ export default function Tariffs() {
 
       {ladder.length > 0 && (
         <Paper>
-          <Title order={4} mb={4}>
+          <Title order={2} mb={4}>
             Fare ladder — {pick.airline}, {pick.city_a} to {pick.city_b}
           </Title>
           <Text size="xs" c="dimmed" mb="md">
@@ -66,7 +66,7 @@ export default function Tariffs() {
       )}
 
       <Paper p={0}>
-        <Title order={4} p="lg" pb="sm">Markets</Title>
+        <Title order={2} p="lg" pb="sm">Markets</Title>
         <Table.ScrollContainer minWidth={900}>
           <Table striped highlightOnHover verticalSpacing="sm" horizontalSpacing="lg">
             <Table.Thead>

@@ -59,7 +59,7 @@ export default function Collection() {
       </SimpleGrid>
 
       <Paper p={0}>
-        <Title order={4} p="lg" pb="sm">By collection day</Title>
+        <Title order={2} p="lg" pb="sm">By collection day</Title>
         {/* A 8-column table does not fit a phone. Scroll the table,
             not the page. */}
         <Table.ScrollContainer minWidth={1240}>
@@ -100,13 +100,13 @@ export default function Collection() {
       </Paper>
 
       <Paper>
-        <Title order={4} mb="sm">Sweep selection</Title>
+        <Title order={2} mb="sm">Sweep selection</Title>
         <Text size="sm" c="dimmed">{d.sweep_selection.rule}</Text>
         <Text size="sm" c="dimmed" mt="xs">{d.sweep_selection.genuineness_screen}</Text>
       </Paper>
 
       <Paper p={0}>
-        <Title order={4} p="lg" pb="sm">Recent fetches</Title>
+        <Title order={2} p="lg" pb="sm">Recent fetches</Title>
         <Table.ScrollContainer minWidth={760}>
           <Table striped verticalSpacing="xs" horizontalSpacing="lg">
             <Table.Thead>

@@ -37,7 +37,7 @@ export default function RouteDetail() {
       {d.has_data && (
         <>
           <Paper>
-            <Title order={4} mb="md">Route index</Title>
+            <Title order={2} mb="md">Route index</Title>
             <AreaChart
               h={260} data={series} dataKey="date"
               series={[{ name: 'Index', color: 'indigo.6' }]}
@@ -53,7 +53,7 @@ export default function RouteDetail() {
 
           <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
             <Paper>
-              <Title order={4} mb={4}>Mean fare by booking window</Title>
+              <Title order={2} mb={4}>Mean fare by booking window</Title>
               <Text size="xs" c="dimmed" mb="md">The lead-time curve for this route</Text>
               <BarChart
                 h={240} data={leads} dataKey="window"
@@ -63,7 +63,7 @@ export default function RouteDetail() {
             </Paper>
 
             <Paper p={0}>
-              <Title order={4} p="lg" pb="sm">Carriers on this route</Title>
+              <Title order={2} p="lg" pb="sm">Carriers on this route</Title>
               {/* A 5-column table does not fit a phone. Scroll the table,
                   not the page. */}
               <Table.ScrollContainer minWidth={970}>
@@ -94,7 +94,7 @@ export default function RouteDetail() {
           </SimpleGrid>
 
           <Paper p={0}>
-            <Title order={4} p="lg" pb="sm">Fare spread by collection day</Title>
+            <Title order={2} p="lg" pb="sm">Fare spread by collection day</Title>
             <Text size="xs" c="dimmed" px="lg" pb="sm">
               Descriptive statistics over observed offers. These are not the index.
             </Text>

@@ -38,7 +38,7 @@ export default function ApiPage() {
          { label: h.status, color: h.status === 'ok' ? 'teal' : 'orange' }])}
 
       <Paper>
-        <Title order={4} mb="sm">Service</Title>
+        <Title order={2} mb="sm">Service</Title>
         {/* A 4-column table does not fit a phone. Scroll the table,
             not the page. */}
         <Table.ScrollContainer minWidth={880}>
@@ -66,13 +66,13 @@ export default function ApiPage() {
       </Paper>
 
       <Paper>
-        <Title order={4} mb="sm">Run it</Title>
+        <Title order={2} mb="sm">Run it</Title>
         <Code block>{`cd /home/monis/sih2026
 PYTHONPATH=.:api uvicorn api.main:app --reload --port 8000`}</Code>
       </Paper>
 
       <Paper p={0}>
-        <Title order={4} p="lg" pb="sm">Endpoints</Title>
+        <Title order={2} p="lg" pb="sm">Endpoints</Title>
         {/* A 4-column table does not fit a phone. Scroll the table,
             not the page. */}
         <Table.ScrollContainer minWidth={880}>
@@ -102,7 +102,7 @@ PYTHONPATH=.:api uvicorn api.main:app --reload --port 8000`}</Code>
       </Paper>
 
       <Paper>
-        <Title order={4} mb="sm">Contract rules</Title>
+        <Title order={2} mb="sm">Contract rules</Title>
         <Stack gap="sm">
           {[
             ['never writes',

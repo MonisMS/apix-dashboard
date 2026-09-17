@@ -18,7 +18,7 @@ export default function Methodology() {
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
         <Card>
           <Badge variant="light" color="indigo" mb="sm">Elementary level</Badge>
-          <Title order={4} mb="xs">Jevons — geometric</Title>
+          <Title order={2} mb="xs">Jevons — geometric</Title>
           <Code block>{f.elementary}</Code>
           <Text size="xs" c="dimmed" mt="sm">{f.elementary_source}</Text>
           <Text size="sm" mt="md">
@@ -30,7 +30,7 @@ export default function Methodology() {
 
         <Card>
           <Badge variant="light" color="teal" mb="sm">Higher level</Badge>
-          <Title order={4} mb="xs">Young — arithmetic</Title>
+          <Title order={2} mb="xs">Young — arithmetic</Title>
           <Code block>{f.higher_level}</Code>
           <Text size="xs" c="dimmed" mt="sm">{f.higher_level_source}</Text>
           <Text size="sm" mt="md">
@@ -41,7 +41,7 @@ export default function Methodology() {
       </SimpleGrid>
 
       <Paper>
-        <Title order={4} mb="sm">Reproducing MoSPI&rsquo;s own worked examples</Title>
+        <Title order={2} mb="sm">Reproducing MoSPI&rsquo;s own worked examples</Title>
         <Text size="sm" c="dimmed" mb="md">
           The Expert Group Report publishes four worked examples. Our engine reproduces all
           four to four decimal places, so the arithmetic is checkable rather than asserted.
@@ -76,7 +76,7 @@ export default function Methodology() {
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
         <Paper>
-          <Title order={4} mb="sm">The cell specification</Title>
+          <Title order={2} mb="sm">The cell specification</Title>
           <Text size="sm">{m.cell}</Text>
           <Text size="sm" mt="md" fw={600}>The item tracked over time</Text>
           <Text size="sm">{m.item}</Text>
@@ -87,7 +87,7 @@ export default function Methodology() {
         </Paper>
 
         <Paper>
-          <Title order={4} mb="sm">Product specification</Title>
+          <Title order={2} mb="sm">Product specification</Title>
           <Table variant="vertical" withTableBorder={false}>
             <Table.Tbody>
               {Object.entries(m.product_specification ?? {}).map(([k, v]) => (

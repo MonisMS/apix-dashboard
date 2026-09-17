@@ -43,7 +43,7 @@ export default function Availability() {
       </Alert>
 
       <Paper>
-        <Title order={4} mb={4}>Were the flights that vanished priced differently?</Title>
+        <Title order={2} mb={4}>Were the flights that vanished priced differently?</Title>
         <Text size="xs" c="dimmed" mb="md">
           The log difference is the headline because it is the quantity the significance
           test operates on. The arithmetic mean is shown beside it and can disagree
@@ -61,7 +61,7 @@ export default function Availability() {
       </Paper>
 
       <Paper p={0}>
-        <Title order={4} p="lg" pb="sm">By transition</Title>
+        <Title order={2} p="lg" pb="sm">By transition</Title>
         <Table.ScrollContainer minWidth={860}>
           <Table striped verticalSpacing="sm" horizontalSpacing="lg">
             <Table.Thead>
@@ -106,7 +106,7 @@ export default function Availability() {
         <Card>
           <Group gap="sm" mb="sm">
             <IconAlertTriangle size={20} color="var(--mantine-color-orange-6)" />
-            <Title order={4}>What the data says</Title>
+            <Title order={2}>What the data says</Title>
           </Group>
           <Text size="sm">{dis.reading}</Text>
           <Badge mt="md" variant="light"
@@ -116,7 +116,7 @@ export default function Availability() {
         </Card>
 
         <Card>
-          <Title order={4} mb={4}>How big is the unknown?</Title>
+          <Title order={2} mb={4}>How big is the unknown?</Title>
           <Text size="xs" c="dimmed" mb="md">
             If the vanished flights would have moved differently from the ones that
             stayed, the index is off by roughly their weight times that difference.

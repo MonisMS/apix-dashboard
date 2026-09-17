@@ -100,7 +100,7 @@ export default function Split() {
       </SimpleGrid>
 
       <Paper>
-        <Title order={4} mb={4}>Tax share by carrier</Title>
+        <Title order={2} mb={4}>Tax share by carrier</Title>
         <Text size="xs" c="dimmed" mb="md">
           Akasa reports about 4% where IndiGo and Air India report about 24%, on the
           same routes on the same day. That is not an error and it is not a different
@@ -150,7 +150,7 @@ export default function Split() {
       <Paper p={0}>
         <Group gap="sm" p="lg" pb="sm">
           <IconReceiptTax size={20} aria-hidden="true" />
-          <Title order={4}>What we can and cannot observe</Title>
+          <Title order={2}>What we can and cannot observe</Title>
         </Group>
         {/* A 4-column table does not fit a phone. Scroll the table,
             not the page. */}
@@ -186,7 +186,7 @@ export default function Split() {
       </Paper>
 
       <Paper p={0}>
-          <Title order={4} p="lg" pb="sm">Tax share by route</Title>
+          <Title order={2} p="lg" pb="sm">Tax share by route</Title>
           <Text size="xs" c="dimmed" px="lg" pb="sm">
             Route-level variation is mostly carrier mix: a route Akasa flies pulls the
             average down, not because the route is taxed differently.

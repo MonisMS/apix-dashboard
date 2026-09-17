@@ -1,5 +1,6 @@
 import { Joyride, STATUS } from 'react-joyride';
 import { useNavigate } from 'react-router-dom';
+import { TourTooltip } from './TourTooltip';
 
 /**
  * The judge-demo path. Content is drawn from the PS text itself (SIH26056)
@@ -30,7 +31,7 @@ const STEPS = [
       'pulled from the same API that powers the dashboard -- reload this page and they can change.',
   },
   {
-    target: '[data-tour="cta-dashboard"]',
+    target: '[data-tour="nav-dashboard"]',
     title: 'Into the dashboard',
     content: 'From here we go into the full dashboard -- the index, five booking-window sub-indices ' +
       '(T+1, T+7, T+15, T+30, T+45 days), and the data quality pages.',
@@ -60,7 +61,9 @@ const OVERVIEW_STEPS = [
 
 export function GuidedTour({ run, onFinish, page = 'landing' }) {
   const navigate = useNavigate();
-  const steps = page === 'overview' ? OVERVIEW_STEPS : STEPS;
+  // scrollOffset clears the sticky shortfall banner + header (~110px combined)
+  // so a scrolled-to target doesn't land underneath them.
+  const steps = (page === 'overview' ? OVERVIEW_STEPS : STEPS).map((s) => ({ ...s, scrollOffset: 120 }));
 
   return (
     <Joyride
@@ -68,23 +71,22 @@ export function GuidedTour({ run, onFinish, page = 'landing' }) {
       run={run}
       continuous
       showSkipButton
-      showProgress
-      disableScrolling
-      callback={(data) => {
-        const { status, index, action, lifecycle, step } = data;
-        if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
+      tooltipComponent={TourTooltip}
+      onEvent={({ status }) => {
+        if (status === STATUS.FINISHED) {
           onFinish?.();
+          if (page === 'landing') navigate('/overview');
           return;
         }
-        if (page === 'landing' && lifecycle === 'complete' && action === 'next' && index === STEPS.length - 1) {
-          navigate('/overview');
+        if (status === STATUS.SKIPPED) {
+          onFinish?.();
         }
       }}
       styles={{
         options: {
           arrowColor: 'var(--popover)',
           backgroundColor: 'var(--popover)',
-          overlayColor: 'rgba(11, 22, 34, 0.55)',
+          overlayColor: 'rgba(25, 25, 23, 0.55)',
           primaryColor: 'var(--primary)',
           textColor: 'var(--popover-foreground)',
           zIndex: 1000,
