@@ -1,10 +1,10 @@
-import { Alert, Badge, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
+import { Badge, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
 import { BarChart, LineChart } from '../compat/mantine-charts';
-import { IconInfoCircle } from '../compat/icons';
 import { useWindows } from '../api';
 import { idx, rupees, sharePct, shortDate } from '../format';
 import { pageHeader, queryState } from '../state';
 import { SERIES_COLORS } from '../chartTokens';
+import { Note } from '../ui';
 
 export default function Windows() {
   const q = useWindows();
@@ -32,10 +32,10 @@ export default function Windows() {
         'Each advance-purchase window published separately, and blended into the headline',
         [{ label: `${windows.length} windows`, color: 'gray' }])}
 
-      <Alert variant="light" color="blue" icon={<IconInfoCircle size={18} aria-hidden="true" />} title="Why five windows and not one">
+      <Note title="Why five windows and not one">
         <Text size="sm">{q.data.mospi_note}</Text>
         <Text size="sm" mt="xs">{q.data.weighting_note}</Text>
-      </Alert>
+      </Note>
 
       <Paper>
         <Title order={2} mb={4}>Index by advance-purchase window</Title>
@@ -96,7 +96,7 @@ export default function Windows() {
                     <Table.Td ta="right">{w.n_offers}</Table.Td>
                     <Table.Td ta="right">{rupees(w.mean_fare)}</Table.Td>
                     <Table.Td ta="right">
-                      <Text fw={700} size="sm">
+                      <Text fw={600} size="sm">
                         {idx(w.points[w.points.length - 1]?.level)}
                       </Text>
                     </Table.Td>

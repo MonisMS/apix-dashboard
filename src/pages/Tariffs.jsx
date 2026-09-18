@@ -1,10 +1,11 @@
-import { Alert, Anchor, Badge, Button, Card, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
+import { Anchor, Badge, Button, Card, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
 import { LineChart } from '../compat/mantine-charts';
-import { IconInfoCircle, IconReceipt2 } from '../compat/icons';
+import { IconReceipt2 } from '../compat/icons';
 import { useState } from 'react';
 import { useTariffs } from '../api';
 import { rupees } from '../format';
 import { pageHeader, queryState } from '../state';
+import { Note } from '../ui';
 
 export default function Tariffs() {
   const q = useTariffs();
@@ -27,11 +28,10 @@ export default function Tariffs() {
       {pageHeader('Published tariffs', 'Fare bands airlines publish under Rule 135 of the Aircraft Rules',
         [{ label: `${d.n_markets} markets`, color: 'gray' }])}
 
-      <Alert variant="light" color="blue" icon={<IconInfoCircle size={18} aria-hidden="true" />}
-             title="Published for the public, so no scraping question arises">
+      <Note title="Published for the public, so no scraping question arises">
         <Text size="sm">{d.legal_basis}</Text>
         <Text size="sm" mt="xs" fw={600}>{d.caveat}</Text>
-      </Alert>
+      </Note>
 
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
         {Object.entries(d.sources ?? {}).map(([airline, src]) => (

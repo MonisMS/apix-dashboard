@@ -4,11 +4,11 @@ import { RotateCcw } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Alert, Progress, SegmentedControl, SimpleGrid, Table } from '../compat/mantine';
+import { Progress, SegmentedControl, SimpleGrid, Table } from '../compat/mantine';
 import { AreaChart } from '../compat/mantine-charts';
 import { useAudit, useIndex, useRoutes } from '../api';
 import { count, idx, lastChange, sharePct, shortDate } from '../format';
-import { Delta, PageHeader, queryState } from '../ui';
+import { Delta, Note, PageHeader, queryState } from '../ui';
 import { CHART } from '../chartTokens';
 import { GuidedTour } from '../components/GuidedTour';
 
@@ -79,25 +79,25 @@ export default function Overview() {
         <Card className="flex-row flex-wrap items-center justify-between gap-6 p-5">
           <div>
             <p className="text-xs text-muted-foreground">Index level</p>
-            <p className="tabular mt-0.5 text-[22px] font-semibold leading-tight">{idx(last?.level)}</p>
+            <p className="tabular mt-0.5 text-[22px] font-medium leading-tight">{idx(last?.level)}</p>
             <Delta value={dod} />
           </div>
           <div className="hidden h-10 w-px bg-border sm:block" />
           <div>
             <p className="text-xs text-muted-foreground">Routes covered</p>
-            <p className="tabular mt-0.5 text-[22px] font-semibold leading-tight">
+            <p className="tabular mt-0.5 text-[22px] font-medium leading-tight">
               {cov.routes_with_data} / {cov.routes_in_basket}
             </p>
           </div>
           <div className="hidden h-10 w-px bg-border sm:block" />
           <div>
             <p className="text-xs text-muted-foreground">Cells priced</p>
-            <p className="tabular mt-0.5 text-[22px] font-semibold leading-tight">{count(totalCells)}</p>
+            <p className="tabular mt-0.5 text-[22px] font-medium leading-tight">{count(totalCells)}</p>
           </div>
           <div className="hidden h-10 w-px bg-border sm:block" />
           <div>
             <p className="text-xs text-muted-foreground">Item match rate</p>
-            <p className="tabular mt-0.5 text-[22px] font-semibold leading-tight">
+            <p className="tabular mt-0.5 text-[22px] font-medium leading-tight">
               {latestChurn ? sharePct(latestChurn.match_rate, 1) : '—'}
             </p>
           </div>
@@ -188,11 +188,11 @@ export default function Overview() {
       </Card>
 
       {!STATIC && (
-        <Alert color="navy">
+        <Note>
           The series begins {shortDate(cov.first_date)} and has {cov.n_points} daily points.
           Every number here is provisional and the reference window will be re-referenced without
           revising any published link.
-        </Alert>
+        </Note>
       )}
     </div>
   );

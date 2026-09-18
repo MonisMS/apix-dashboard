@@ -1,9 +1,9 @@
-import { Alert, Badge, Group, Paper, Stack, Table, Tabs, Text, Title, Tooltip } from '../compat/mantine';
+import { Badge, Group, Paper, Stack, Table, Tabs, Text, Title, Tooltip } from '../compat/mantine';
 import { LineChart } from '../compat/mantine-charts';
-import { IconInfoCircle } from '../compat/icons';
 import { useAudit, useIndex } from '../api';
 import { count, idx, pct, sharePct, shortDate } from '../format';
 import { pageHeader, queryState } from '../state';
+import { Note } from '../ui';
 
 export default function IndexDetail() {
   // No URL sync for the tab, deliberately. Daily is the only enabled value, so
@@ -47,13 +47,13 @@ export default function IndexDetail() {
 
         <Tabs.Panel value="D">
           <Stack gap="lg">
-            <Alert variant="light" color="blue" icon={<IconInfoCircle size={18} aria-hidden="true" />}>
+            <Note>
               <Text size="sm">
                 Weekly and monthly are disabled rather than approximated. Averaging three
                 days and labelling it &ldquo;weekly&rdquo; would be a different estimator wearing
                 the same name.
               </Text>
-            </Alert>
+            </Note>
 
             <Paper>
               <Title order={2} mb="md">Daily series</Title>
@@ -87,7 +87,7 @@ export default function IndexDetail() {
                     {points.map((p) => (
                       <Table.Tr key={p.period_start}>
                         <Table.Td>{p.period_start}</Table.Td>
-                        <Table.Td ta="right"><Text fw={700} size="sm">{idx(p.level)}</Text></Table.Td>
+                        <Table.Td ta="right"><Text fw={600} size="sm">{idx(p.level)}</Text></Table.Td>
                         <Table.Td ta="right">{p.link ? p.link.toFixed(6) : '—'}</Table.Td>
                         <Table.Td ta="right">{count(p.n_cells)}</Table.Td>
                         <Table.Td ta="right">{p.n_cells_imputed}</Table.Td>
@@ -118,15 +118,15 @@ export default function IndexDetail() {
               <Group gap="xl">
                 <div>
                   <Text size="xs" c="dimmed">Chained</Text>
-                  <Text fw={700}>{idx(audit.data.transitivity.chained_raw_level)}</Text>
+                  <Text fw={600}>{idx(audit.data.transitivity.chained_raw_level)}</Text>
                 </div>
                 <div>
                   <Text size="xs" c="dimmed">Direct fixed-base</Text>
-                  <Text fw={700}>{idx(audit.data.transitivity.direct_fixed_base)}</Text>
+                  <Text fw={600}>{idx(audit.data.transitivity.direct_fixed_base)}</Text>
                 </div>
                 <div>
                   <Text size="xs" c="dimmed">Drift</Text>
-                  <Text fw={700}>{pct(audit.data.transitivity.drift_pct, 3)}</Text>
+                  <Text fw={600}>{pct(audit.data.transitivity.drift_pct, 3)}</Text>
                 </div>
               </Group>
               <Text size="xs" c="dimmed" mt="md">{audit.data.transitivity.note}</Text>

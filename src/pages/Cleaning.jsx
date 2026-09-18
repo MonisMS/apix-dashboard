@@ -1,6 +1,6 @@
-import { Alert, Badge, Card, Code, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
+import { Badge, Card, Code, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
 import { BarChart } from '../compat/mantine-charts';
-import { IconAlertTriangle, IconFilter } from '../compat/icons';
+import { IconFilter } from '../compat/icons';
 import { useCleaning } from '../api';
 import { idx, pct, sharePct, shortDate } from '../format';
 import { pageHeader, queryState } from '../state';
@@ -30,11 +30,6 @@ export default function Cleaning() {
       {pageHeader('Cleaning', 'Outlier screening on day-on-day movements, not on price levels', [
         { label: `${d.n_flags} flagged`, color: d.n_flags ? 'orange' : 'gray' },
       ])}
-
-      <Alert variant="light" color="orange" icon={<IconAlertTriangle size={18} aria-hidden="true" />}
-             title="Why the textbook screen is switched off">
-        <Text size="sm">{d.mad.why_default_off}</Text>
-      </Alert>
 
       <Paper>
         <Title order={2} mb={4}>What each screening rule does to the published number</Title>

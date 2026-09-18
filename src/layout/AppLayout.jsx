@@ -88,7 +88,7 @@ function AsideSummary() {
     <div className="hidden xl:flex xl:w-64 xl:shrink-0 xl:flex-col xl:gap-6 xl:border-l xl:border-border xl:p-5">
       <div>
         <p className="text-xs text-muted-foreground">Current level</p>
-        <p className="tabular mt-0.5 text-[28px] font-semibold leading-tight">{idx(last?.level)}</p>
+        <p className="tabular mt-0.5 text-[28px] font-medium leading-tight">{idx(last?.level)}</p>
         <p className="mt-1 text-xs text-muted-foreground">
           {last ? shortDate(last.period_start) : '—'}
           {index?.reference?.is_provisional ? ' · provisional' : ''}
@@ -97,7 +97,7 @@ function AsideSummary() {
       <Separator />
       <div>
         <p className="text-xs text-muted-foreground">Route coverage</p>
-        <p className="tabular mt-0.5 text-sm font-semibold">
+        <p className="tabular mt-0.5 text-sm font-medium">
           {cov
             ? `${cov.routes_with_data} of ${cov.routes_in_basket} · ${sharePct(
                 cov.routes_with_data / cov.routes_in_basket,

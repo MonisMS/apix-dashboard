@@ -1,10 +1,10 @@
-import { Alert, Badge, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
+import { Badge, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
 import { DonutChart } from '../compat/mantine-charts';
-import { IconInfoCircle } from '../compat/icons';
 import { useCarriers } from '../api';
 import { idx, pct, rupees, sharePct } from '../format';
 import { pageHeader, queryState } from '../state';
 import { SERIES_COLORS } from '../chartTokens';
+import { Note } from '../ui';
 
 export default function Carriers() {
   const q = useCarriers();
@@ -23,9 +23,7 @@ export default function Carriers() {
       {pageHeader('Carriers', 'The airline is part of the cell specification, so each carrier has its own index',
         [{ label: `${rows.length} observed`, color: 'gray' }])}
 
-      <Alert variant="light" color="blue" icon={<IconInfoCircle size={18} aria-hidden="true" />}>
-        <Text size="sm">{q.data.note}</Text>
-      </Alert>
+      <Note><Text size="sm">{q.data.note}</Text></Note>
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
         <Paper>
@@ -70,7 +68,7 @@ export default function Carriers() {
                     <Table.Td ta="right">{sharePct(c.weight_share)}</Table.Td>
                     <Table.Td ta="right">{c.n_offers}</Table.Td>
                     <Table.Td ta="right">{rupees(c.mean_fare)}</Table.Td>
-                    <Table.Td ta="right"><Text fw={700} size="sm">{idx(c.level)}</Text></Table.Td>
+                    <Table.Td ta="right"><Text fw={600} size="sm">{idx(c.level)}</Text></Table.Td>
                     <Table.Td ta="right">
                       <Badge size="sm" variant="light" color={c.pct_change_1p >= 0 ? 'teal' : 'red'}>
                         {pct(c.pct_change_1p)}

@@ -1,5 +1,5 @@
-import { Alert, Badge, Card, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
-import { IconAlertTriangle, IconClock } from '../compat/icons';
+import { Alert, Badge, Paper, Stack, Table, Text, Title } from '../compat/mantine';
+import { IconAlertTriangle } from '../compat/icons';
 import { useCollection, useRunLog } from '../api';
 import { count, shortDate } from '../format';
 import { pageHeader, queryState } from '../state';
@@ -18,22 +18,6 @@ export default function Collection() {
       {pageHeader('Collection', 'What we tried to collect, what we got, and what that costs the index',
         [{ label: `${s.days} days`, color: 'gray' }, { label: `${count(s.observations)} observations`, color: 'gray' }])}
 
-      {d.clock.varies_across_days && (
-        <Alert variant="light" color="orange" icon={<IconClock size={18} aria-hidden="true" />}
-               title={`Scheduled daily at ${d.clock.nominal_time_ist} IST`}>
-          <Text size="sm">{d.clock.nominal_note}</Text>
-          <Text size="sm" mt="xs">{d.clock.warning}</Text>
-          <Group gap="xs" mt="sm">
-            {(d.clock.actual_ist_observed ?? []).map((h, i) => (
-              <Badge key={i} variant="light" color="orange">actual {h} IST</Badge>
-            ))}
-            <Badge variant="light" color="gray">
-              max drift {d.clock.max_abs_drift_minutes} min
-            </Badge>
-          </Group>
-        </Alert>
-      )}
-
       {d.routes.never_attempted.length > 0 && (
         <Alert variant="light" color="yellow" icon={<IconAlertTriangle size={18} aria-hidden="true" />}
                title={`${d.routes.never_attempted.length} basket routes were never attempted`}>
@@ -44,19 +28,19 @@ export default function Collection() {
         </Alert>
       )}
 
-      <SimpleGrid cols={{ base: 1, sm: 4 }} spacing="lg">
+      <div className="lc-stats">
         {[
           ['Observations', count(s.observations)],
           ['Used by the index', count(s.rows_selected)],
           ['Sweeps', count(s.sweeps)],
           ['Basket pax covered', `${d.routes.basket_pax_covered_pct}%`],
         ].map(([label, value]) => (
-          <Card key={label}>
-            <Text size="xs" c="dimmed" tt="uppercase" fw={700}>{label}</Text>
-            <Title order={3} mt={4}>{value}</Title>
-          </Card>
+          <div className="lc-stat" key={label}>
+            <span className="k">{label}</span>
+            <span className="v">{value}</span>
+          </div>
         ))}
-      </SimpleGrid>
+      </div>
 
       <Paper p={0}>
         <Title order={2} p="lg" pb="sm">By collection day</Title>

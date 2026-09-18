@@ -1,6 +1,6 @@
-import { Alert, Badge, Card, Group, List, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
+import { Badge, Card, Group, List, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
 import { LineChart } from '../compat/mantine-charts';
-import { IconAlertTriangle, IconCircleCheck } from '../compat/icons';
+import { IconCircleCheck } from '../compat/icons';
 import { useValidation } from '../api';
 import { idx, pct } from '../format';
 import { pageHeader, queryState } from '../state';
@@ -19,14 +19,6 @@ export default function Validation() {
     <Stack gap="lg">
       {pageHeader('Validation', 'APIx against MoSPI’s published Airfare item 294',
         [{ label: d.overlap.has_overlap ? 'overlapping' : 'no overlap', color: d.overlap.has_overlap ? 'teal' : 'orange' }])}
-
-      <Alert variant="light" color="orange" icon={<IconAlertTriangle size={18} aria-hidden="true" />}
-             title="The two series do not overlap">
-        <Text size="sm">{d.overlap.statement}</Text>
-        <Text size="sm" mt="sm" fw={600}>
-          Correlation is not reported because it cannot be computed: {d.correlation_reason}
-        </Text>
-      </Alert>
 
       <Paper>
         <Title order={2} mb={4}>MoSPI published Airfare index</Title>
@@ -130,7 +122,7 @@ export default function Validation() {
             <Table.Tbody>
               <Table.Tr>
                 <Table.Th w={220}>First comparable month</Table.Th>
-                <Table.Td><Text fw={700}>{h.first_comparable.month}</Text></Table.Td>
+                <Table.Td><Text fw={600}>{h.first_comparable.month}</Text></Table.Td>
               </Table.Tr>
               <Table.Tr>
                 <Table.Th>Days needed</Table.Th>
@@ -199,12 +191,12 @@ export default function Validation() {
             {h.seasonal_context.observations.map((o) => (
               <div key={o.period}>
                 <Text size="xs" c="dimmed">{o.period}</Text>
-                <Text fw={700} c={o.pct < 0 ? 'red' : 'teal'}>{pct(o.pct)}</Text>
+                <Text fw={600} c={o.pct < 0 ? 'red' : 'teal'}>{pct(o.pct)}</Text>
               </div>
             ))}
             <div>
               <Text size="xs" c="dimmed">APIx so far</Text>
-              <Text fw={700} c="red">falling</Text>
+              <Text fw={600} c="red">falling</Text>
             </div>
           </Group>
           <Text size="xs" c="dimmed" mt="md">{h.seasonal_context.caveat}</Text>

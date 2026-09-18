@@ -1,10 +1,11 @@
-import { Alert, Card, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
+import { Card, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
 import { DonutChart } from '../compat/mantine-charts';
-import { IconInfoCircle, IconScale } from '../compat/icons';
+import { IconScale } from '../compat/icons';
 import { useWeights } from '../api';
 import { count, rupees, sharePct } from '../format';
 import { pageHeader, queryState } from '../state';
 import { SERIES_COLORS } from '../chartTokens';
+import { Note } from '../ui';
 
 export default function Weights() {
   const q = useWeights();
@@ -25,12 +26,11 @@ export default function Weights() {
       {pageHeader('Basket & weights', d.provenance.route.method,
         [{ label: `${d.n_cells} cells`, color: 'gray' }, { label: `Σw = ${d.sum}`, color: 'teal' }])}
 
-      <Alert variant="light" color="blue" icon={<IconInfoCircle size={18} aria-hidden="true" />}
-             title="Expenditure shares, not passenger counts">
+      <Note title="Expenditure shares, not passenger counts">
         <Text size="sm">{d.explanation.what_changed}</Text>
         <Text size="sm" mt="xs" fw={600}>{d.explanation.example}</Text>
         <Text size="xs" c="dimmed" mt="xs">{d.explanation.caveat}</Text>
-      </Alert>
+      </Note>
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
         <Paper>
@@ -54,7 +54,7 @@ export default function Weights() {
               <Table.Tbody>
                 <Table.Tr>
                   <Table.Th w={260}>Airfare item weight</Table.Th>
-                  <Table.Td><Text fw={700}>{cpi.airfare_weight_pct}%</Text></Table.Td>
+                  <Table.Td><Text fw={600}>{cpi.airfare_weight_pct}%</Text></Table.Td>
                 </Table.Tr>
                 <Table.Tr>
                   <Table.Th>Group 07.3 passenger transport</Table.Th>
@@ -94,7 +94,7 @@ export default function Weights() {
                   <Table.Td><Text size="sm" fw={600}>{pair}</Text></Table.Td>
                   <Table.Td ta="right">{count(v.pax_cy)}</Table.Td>
                   <Table.Td ta="right">{rupees(v.mean_fare_base)}</Table.Td>
-                  <Table.Td ta="right"><Text fw={700} size="sm">{sharePct(v.weight)}</Text></Table.Td>
+                  <Table.Td ta="right"><Text fw={600} size="sm">{sharePct(v.weight)}</Text></Table.Td>
                 </Table.Tr>
               ))}
             </Table.Tbody>
@@ -109,7 +109,7 @@ export default function Weights() {
           {Object.entries(d.provenance.lead.weights).map(([lead, w]) => (
             <Card key={lead} p="sm" withBorder>
               <Text size="xs" c="dimmed">T+{lead}</Text>
-              <Text fw={700}>{sharePct(w, 0)}</Text>
+              <Text fw={600}>{sharePct(w, 0)}</Text>
             </Card>
           ))}
         </Group>

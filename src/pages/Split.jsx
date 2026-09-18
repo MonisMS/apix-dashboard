@@ -1,11 +1,12 @@
 import {
-  Alert, Badge, Card, Group, Paper, SimpleGrid, Stack, Table, Text, Title,
+  Alert, Badge, Card, Group, Paper, Stack, Table, Text, Title,
 } from '../compat/mantine';
 import { BarChart } from '../compat/mantine-charts';
 import { IconCheck, IconInfoCircle, IconReceiptTax, IconX } from '../compat/icons';
 import { useSplit } from '../api';
 import { count, shortDate } from '../format';
 import { pageHeader, queryState } from '../state';
+import { Note } from '../ui';
 
 /**
  * Base fare vs taxes — the money fields in PS deliverable (b).
@@ -59,45 +60,33 @@ export default function Split() {
         ],
       )}
 
-      <Alert variant="light" color="blue" icon={<IconInfoCircle size={18} aria-hidden="true" />}
-             title="This is a periodic study, not the daily feed">
+      <Note title="This is a periodic study, not the daily feed">
         <Text size="sm">{d.why_not_daily}</Text>
         <Text size="sm" mt="xs">{d.why_not_backfilled}</Text>
-      </Alert>
+      </Note>
 
-      <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
-        <Card>
-          <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Overall tax share</Text>
-          <Text fw={700} fz={34} lh={1.15} mt={4}
-                style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {d.tax_share_pct_overall}%
-          </Text>
-          <Text size="xs" c="dimmed" mt={4}>
-            of the all-in fare, across {count(d.observations)} observations
-          </Text>
-        </Card>
-        <Card>
-          <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Study coverage</Text>
-          <Text fw={700} fz={34} lh={1.15} mt={4}
-                style={{ fontVariantNumeric: 'tabular-nums' }}>
-            {d.share_of_all_observations_pct}%
-          </Text>
-          <Text size="xs" c="dimmed" mt={4}>
+      <div className="lc-stats">
+        <div className="lc-stat">
+          <span className="k">Overall tax share</span>
+          <span className="v">{d.tax_share_pct_overall}%</span>
+          <span className="n">of the all-in fare, across {count(d.observations)} observations</span>
+        </div>
+        <div className="lc-stat">
+          <span className="k">Study coverage</span>
+          <span className="v">{d.share_of_all_observations_pct}%</span>
+          <span className="n">
             of all stored observations carry a split. The other {(100 - d.share_of_all_observations_pct).toFixed(1)}%
             keep NULL rather than a modelled figure.
-          </Text>
-        </Card>
-        <Card>
-          <Text size="xs" c="dimmed" tt="uppercase" fw={700}>Panel</Text>
-          <Text fw={700} fz={34} lh={1.15} mt={4}
-                style={{ fontVariantNumeric: 'tabular-nums' }}>
-            T+{(d.booking_window_days ?? []).join(', T+')}
-          </Text>
-          <Text size="xs" c="dimmed" mt={4}>
+          </span>
+        </div>
+        <div className="lc-stat">
+          <span className="k">Panel</span>
+          <span className="v">T+{(d.booking_window_days ?? []).join(', T+')}</span>
+          <span className="n">
             {(d.study_days ?? []).map(shortDate).join(', ')} · source <b>{d.source}</b>
-          </Text>
-        </Card>
-      </SimpleGrid>
+          </span>
+        </div>
+      </div>
 
       <Paper>
         <Title order={2} mb={4}>Tax share by carrier</Title>

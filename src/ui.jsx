@@ -26,9 +26,26 @@ export function PageHeader({ title, description, badges = [] }) {
   );
 }
 
+/**
+ * Quiet explanatory text -- for methodology/context notes that aren't a
+ * warning or a data gap (those stay as a colored Alert). A colored box with
+ * a triangle icon reads as "something is wrong" even when the content is
+ * just "here's how to read this"; this is the same weight as body copy,
+ * just set off by a rule so it's still visually distinct from surrounding
+ * paragraphs.
+ */
+export function Note({ title, children, className }) {
+  return (
+    <div className={cn('border-l-2 border-border pl-4 text-sm leading-relaxed text-muted-foreground', className)}>
+      {title && <p className="mb-1 font-medium text-foreground">{title}</p>}
+      {children}
+    </div>
+  );
+}
+
 export function Section({ title, description, aside, flush, children, className }) {
   return (
-    <div className={cn('rounded-none border border-border bg-card p-6', flush && 'p-0', className)}>
+    <div className={cn('rounded-[10px] border border-border bg-card p-6', flush && 'p-0', className)}>
       {(title || description || aside) && (
         <div className={cn('mb-4 flex flex-wrap items-start justify-between gap-3', flush && 'p-6 pb-2 mb-0')}>
           <div>
@@ -40,16 +57,6 @@ export function Section({ title, description, aside, flush, children, className 
       )}
       {children}
     </div>
-  );
-}
-
-export function Note({ color = 'navy', title, icon, children }) {
-  return (
-    <Alert>
-      {icon}
-      {title && <AlertTitle>{title}</AlertTitle>}
-      <AlertDescription>{children}</AlertDescription>
-    </Alert>
   );
 }
 
@@ -89,9 +96,9 @@ export function queryState(...queries) {
     return (
       <div className="flex flex-col gap-4" aria-busy="true" aria-live="polite">
         <span className="sr-only">Loading…</span>
-        <Skeleton className="h-[72px] w-full rounded-none" />
-        <Skeleton className="h-[280px] w-full rounded-none" />
-        <Skeleton className="h-[180px] w-full rounded-none" />
+        <Skeleton className="h-[72px] w-full rounded-[10px]" />
+        <Skeleton className="h-[280px] w-full rounded-[10px]" />
+        <Skeleton className="h-[180px] w-full rounded-[10px]" />
       </div>
     );
   }

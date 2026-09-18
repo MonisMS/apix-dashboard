@@ -1,8 +1,8 @@
-import { Alert, Badge, Card, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
+import { Badge, Card, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
 import { BarChart } from '../compat/mantine-charts';
-import { IconAlertTriangle, IconEyeOff } from '../compat/icons';
+import { IconAlertTriangle } from '../compat/icons';
 import { useAvailability } from '../api';
-import { count, pct, rupees, sharePct, shortDate } from '../format';
+import { pct, rupees, sharePct, shortDate } from '../format';
 import { pageHeader, queryState } from '../state';
 
 export default function Availability() {
@@ -13,7 +13,6 @@ export default function Availability() {
   const d = q.data;
   const dis = d.disappearance;
   const bound = d.bias_bound;
-  const obs = d.observed_availability;
 
   const chart = (dis.transitions ?? []).map((t) => ({
     day: shortDate(t.to),
@@ -28,19 +27,6 @@ export default function Availability() {
       {pageHeader('Availability', 'Flights that stop appearing, and what we cannot tell about why', [
         { label: `${(dis.mean_vanish_rate * 100).toFixed(1)}% vanish daily`, color: 'orange' },
       ])}
-
-      <Alert variant="light" color="red" icon={<IconEyeOff size={18} aria-hidden="true" />}
-             title="We do not detect sold-out flights">
-        <Text size="sm">{obs.statement}</Text>
-        <Group gap="xs" mt="sm">
-          <Badge variant="light" color="red">
-            {count(obs.n_with_observed_availability)} of {count(obs.n_observations)} rows observed
-          </Badge>
-          <Badge variant="light" color="gray">
-            seats_left on {count(obs.n_with_seats_left)} rows
-          </Badge>
-        </Group>
-      </Alert>
 
       <Paper>
         <Title order={2} mb={4}>Were the flights that vanished priced differently?</Title>
@@ -84,7 +70,7 @@ export default function Availability() {
                   <Table.Td ta="right">{rupees(t.median_fare_vanished)}</Table.Td>
                   <Table.Td ta="right">{rupees(t.median_fare_survived)}</Table.Td>
                   <Table.Td ta="right">
-                    <Text fw={700} size="sm"
+                    <Text fw={600} size="sm"
                           c={t.price_differential_pct > 0 ? 'teal' : 'red'}>
                       {pct(t.price_differential_pct)}
                     </Text>
@@ -133,7 +119,7 @@ export default function Availability() {
                 <Table.Tr key={k}>
                   <Table.Td>{k}</Table.Td>
                   <Table.Td ta="right">
-                    <Text fw={700} size="sm">{v.toFixed(3)} pts</Text>
+                    <Text fw={600} size="sm">{v.toFixed(3)} pts</Text>
                   </Table.Td>
                 </Table.Tr>
               ))}

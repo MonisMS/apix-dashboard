@@ -1,12 +1,12 @@
 import {
-  Alert, Group, Paper, ScrollArea, SegmentedControl, Stack, Text, Title,
+  Group, Paper, ScrollArea, SegmentedControl, Stack, Text, Title,
 } from '../compat/mantine';
 import { MatrixChart } from '../compat/mantine-charts';
-import { IconInfoCircle } from '../compat/icons';
 import { useSearchParams } from 'react-router-dom';
 import { useHeatmap } from '../api';
 import { rupees, shortDate } from '../format';
 import { pageHeader, queryState } from '../state';
+import { Note } from '../ui';
 
 const METRICS = [
   { label: 'Day-on-day %', value: 'pct_change' },
@@ -58,9 +58,7 @@ export default function Heatmap() {
         { label: `${d.y_labels.length} routes`, color: 'gray' },
       ])}
 
-      <Alert variant="light" color="blue" icon={<IconInfoCircle size={18} aria-hidden="true" />}>
-        <Text size="sm">{d.note}</Text>
-      </Alert>
+      <Note><Text size="sm">{d.note}</Text></Note>
 
       <Paper>
         <Group justify="space-between" mb="lg">

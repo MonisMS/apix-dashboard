@@ -51,21 +51,26 @@ export function Group({
 }
 
 export function SimpleGrid({ cols, spacing = 'md', children, className, style, ...rest }) {
-  const base = typeof cols === 'object' ? (cols.base ?? 1) : (cols ?? 1);
-  const sm = typeof cols === 'object' ? cols.sm : undefined;
-  const lg = typeof cols === 'object' ? (cols.lg ?? sm) : undefined;
   const { style: s, rest: r } = splitProps(rest);
+  // Tailwind's responsive grid-cols-N utilities only exist for the class names
+  // literally present in source, so an arbitrary { sm: 4 } (or any count this
+  // file doesn't special-case) silently produced no responsive class at all
+  // and fell through to a single column at every width. A CSS auto-fit grid
+  // sidesteps that: it reflows to however many columns fit >= the narrowest
+  // requested count's implied width, with no breakpoint enumeration needed.
+  const maxCols = typeof cols === 'object'
+    ? Math.max(cols.base ?? 1, cols.sm ?? 1, cols.md ?? 1, cols.lg ?? 1)
+    : (cols ?? 1);
+  const minWidth = Math.max(140, Math.floor(720 / maxCols));
   return (
     <div
-      className={cn(
-        'grid',
-        base === 1 && 'grid-cols-1',
-        sm === 2 && 'sm:grid-cols-2',
-        lg === 2 && 'lg:grid-cols-2',
-        lg === 3 && 'lg:grid-cols-3',
-        className,
-      )}
-      style={{ gap: gapPx(spacing), ...s, ...style }}
+      className={cn('grid', className)}
+      style={{
+        gap: gapPx(spacing),
+        gridTemplateColumns: `repeat(auto-fit, minmax(${minWidth}px, 1fr))`,
+        ...s,
+        ...style,
+      }}
       {...r}
     >
       {children}
@@ -174,7 +179,7 @@ export function Alert({ color = 'navy', title, icon, children, className, style,
   return (
     <div
       role="alert"
-      className={cn('rounded-none border border-border p-4', className)}
+      className={cn('rounded-[10px] border border-border p-4', className)}
       style={{ ...soft, ...s, ...style }}
       {...r}
     >
@@ -193,7 +198,7 @@ export function Paper({ children, p = 'lg', className, style, ...rest }) {
   const { style: s, rest: r } = splitProps(rest);
   return (
     <div
-      className={cn('rounded-none border border-border bg-card text-card-foreground', className)}
+      className={cn('rounded-[10px] border border-border bg-card text-card-foreground overflow-hidden', className)}
       style={{ padding: p === 0 ? 0 : undefined, ...boxStyle({ p: p === 0 ? 0 : 'lg' }), ...s, ...style }}
       {...r}
     >
@@ -206,7 +211,7 @@ export function Card({ children, p = 'lg', withBorder = true, className, style, 
   const { style: s, rest: r } = splitProps(rest);
   return (
     <div
-      className={cn('rounded-none bg-card text-card-foreground', withBorder && 'border border-border', className)}
+      className={cn('rounded-[10px] bg-card text-card-foreground', withBorder && 'border border-border', className)}
       style={{ ...boxStyle({ p }), ...s, ...style }}
       {...r}
     >
@@ -226,7 +231,7 @@ export function ScrollArea({ children, className, style, ...rest }) {
 export function Skeleton({ height = 20, className, style }) {
   return (
     <div
-      className={cn('animate-pulse rounded-none bg-muted', className)}
+      className={cn('animate-pulse rounded-[10px] bg-muted', className)}
       style={{ height, ...style }}
     />
   );
@@ -366,7 +371,7 @@ Table.Th = function Th({ children, ta, w, className, style, ...rest }) {
   return (
     <th
       className={cn(
-        'py-2 pr-3 font-mono text-[11px] font-medium uppercase tracking-wider text-muted-foreground',
+        'px-3 py-2 first:pl-6 last:pr-6 font-mono text-[11px] font-medium uppercase tracking-wider text-muted-foreground',
         ta === 'right' && 'text-right',
         className,
       )}
@@ -379,7 +384,11 @@ Table.Th = function Th({ children, ta, w, className, style, ...rest }) {
 };
 Table.Td = function Td({ children, ta, className, style, ...rest }) {
   return (
-    <td className={cn('py-2 pr-3', ta === 'right' && 'text-right', className)} style={style} {...rest}>
+    <td
+      className={cn('px-3 py-2 first:pl-6 last:pr-6', ta === 'right' && 'text-right', className)}
+      style={style}
+      {...rest}
+    >
       {children}
     </td>
   );

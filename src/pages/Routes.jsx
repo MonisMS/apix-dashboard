@@ -1,6 +1,6 @@
 import { Alert, Badge, Group, Paper, Stack, Table, Text, Title } from '../compat/mantine';
 import { BarChart } from '../compat/mantine-charts';
-import { IconInfoCircle } from '../compat/icons';
+import { IconAlertTriangle } from '../compat/icons';
 import { Link } from 'react-router-dom';
 import { useRoutes } from '../api';
 import { count, idx, pct, rupees, sharePct } from '../format';
@@ -27,7 +27,7 @@ export default function Routes() {
       ])}
 
       {cov.routes_without_fares.length > 0 && (
-        <Alert variant="light" color="orange" icon={<IconInfoCircle size={18} aria-hidden="true" />}
+        <Alert variant="light" color="orange" icon={<IconAlertTriangle size={18} aria-hidden="true" />}
                title={`${cov.routes_without_fares.length} basket routes have no fares yet`}>
           <Text size="sm">
             {cov.routes_without_fares.join(', ')} are in the basket but the collector has
@@ -86,7 +86,7 @@ export default function Routes() {
                   <Table.Td ta="right">{count(r.pax_cy)}</Table.Td>
                   <Table.Td ta="right">{r.has_data ? sharePct(r.weight) : '—'}</Table.Td>
                   <Table.Td ta="right">{rupees(r.mean_fare_latest)}</Table.Td>
-                  <Table.Td ta="right"><Text fw={700} size="sm">{idx(r.level)}</Text></Table.Td>
+                  <Table.Td ta="right"><Text fw={600} size="sm">{idx(r.level)}</Text></Table.Td>
                   <Table.Td ta="right">
                     {r.has_data ? (
                       <Badge size="sm" variant="light" color={r.pct_change_1p >= 0 ? 'teal' : 'red'}>

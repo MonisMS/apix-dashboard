@@ -1,5 +1,5 @@
-import { Alert, Badge, Card, Code, Group, List, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
-import { IconAlertTriangle, IconCircleCheck } from '../compat/icons';
+import { Badge, Card, Code, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
+import { IconCircleCheck } from '../compat/icons';
 import { useMethodology } from '../api';
 import { pageHeader, queryState } from '../state';
 
@@ -103,12 +103,6 @@ export default function Methodology() {
         </Paper>
       </SimpleGrid>
 
-      <Alert variant="light" color="orange" icon={<IconAlertTriangle size={18} aria-hidden="true" />}
-             title="What we do not claim">
-        <List size="sm" spacing="xs">
-          {(m.caveats ?? []).map((c) => <List.Item key={c}>{c}</List.Item>)}
-        </List>
-      </Alert>
     </Stack>
   );
 }
