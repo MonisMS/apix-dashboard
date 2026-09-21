@@ -194,16 +194,19 @@ export default function AppLayout({ children }) {
             <button
               type="button"
               onClick={startTour}
-              className="hidden h-8 shrink-0 items-center gap-1.5 rounded-none border border-border px-2.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground sm:inline-flex"
+              aria-label="Start the guided tour"
+              className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-none border border-border px-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground sm:px-2.5"
             >
               <Play className="h-3.5 w-3.5" aria-hidden="true" />
-              Tour
+              {/* Icon-only on a phone: it was hidden entirely below sm, which
+                  left no way to restart the tour from inside the console. */}
+              <span className="hidden sm:inline">Tour</span>
             </button>
             <ThemeToggle />
           </div>
         </header>
         <main id="main-content" className="flex flex-1">
-          <div className="apix-main mx-auto w-full max-w-[70rem] flex-1 p-4 md:p-6">
+          <div className="apix-main mx-auto w-full max-w-[70rem] flex-1 p-4 pb-24 md:p-6 md:pb-6">
             {children}
           </div>
           <AsideSummary />

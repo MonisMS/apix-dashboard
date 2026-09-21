@@ -113,14 +113,18 @@ function ShortfallBar({ point, onDismiss }) {
   return (
     <div
       role="alert"
-      className="relative flex items-center gap-3 px-10 py-2 text-center text-[13.5px] font-medium text-[#17181A]"
+      className="relative flex items-center gap-3 px-9 py-1.5 text-center text-[12px] font-medium text-[#17181A] sm:px-10 sm:py-2 sm:text-[13.5px]"
       style={{ background: 'var(--warn-fill)' }}
     >
       <p className="flex-1 leading-snug">
         {count(point.n_cells_imputed)} of {count(point.n_cells)} price cells had no fare to
         compare today, so they follow the movement of the routes around them. That covers{' '}
-        {sharePct(point.weight_imputed, 1)} of the basket. We publish the number with the gap
-        stated rather than hold it back.
+        {sharePct(point.weight_imputed, 1)} of the basket.
+        {/* The justification is worth saying, but not worth five lines on a
+            phone before anything else is visible. */}
+        <span className="hidden sm:inline">
+          {' '}We publish the number with the gap stated rather than hold it back.
+        </span>
       </p>
       <button
         type="button"

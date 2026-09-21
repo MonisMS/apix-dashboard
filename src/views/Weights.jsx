@@ -51,8 +51,12 @@ export default function Weights() {
                 style={{ width: `${v.weight * 100}%`, background: shade(i) }}
                 title={`${pair} — ${sharePct(v.weight)} of the basket`}
               >
+                {/* Hidden below sm: at phone width these wrapped to two lines
+                    inside the segment. The key underneath names every route. */}
                 {v.weight > 0.075 && (
-                  <span className="px-1 text-[10px] font-medium text-foreground/90">{pair}</span>
+                  <span className="hidden whitespace-nowrap px-1 text-[10px] font-medium text-foreground/90 sm:inline">
+                    {pair}
+                  </span>
                 )}
               </div>
             ))}

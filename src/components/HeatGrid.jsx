@@ -70,9 +70,17 @@ export function HeatGrid({
   };
 
   return (
+    // A floor on the column width, and the grid scrolls inside its own card.
+    // Pure 1fr columns collapsed to ~37px on a phone, which clipped every
+    // value mid-number and reduced the date headers to "1...". On a desktop
+    // the columns still stretch to fill, so nothing scrolls there.
+    <div className="w-full max-w-full overflow-x-auto">
     <div
-      className="grid w-full gap-px text-[11px]"
-      style={{ gridTemplateColumns: `minmax(64px, max-content) repeat(${xLabels.length}, minmax(0, 1fr))` }}
+      className="grid gap-px text-[11px]"
+      style={{
+        minWidth: 'max-content',
+        gridTemplateColumns: `minmax(64px, max-content) repeat(${xLabels.length}, minmax(52px, 1fr))`,
+      }}
       role="table"
       aria-label="Route by collection day"
     >
@@ -129,6 +137,7 @@ export function HeatGrid({
           })}
         </div>
       ))}
+    </div>
     </div>
   );
 }

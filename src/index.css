@@ -368,12 +368,21 @@ body:has(.landing-theme) #react-joyride-portal {
   .landing-hero {
     min-height: 0;
   }
-  .landing-globe {
-    order: 1;
-    min-height: 280px;
-  }
+  /* Copy first, decoration second. These orders were the other way round, so
+     on a phone the globe filled the whole first screen and the headline --
+     the one thing a visitor needs -- started below the fold. */
   .landing-copy {
+    order: 1;
+  }
+  .landing-globe {
     order: 2;
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 560px) {
+  .landing-globe {
+    min-height: 200px;
   }
 }
 
