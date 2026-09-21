@@ -31,19 +31,38 @@ const types = {
  * DATABASE_URL must be the POOLED (-pooler) Neon host. The non-pooled endpoint
  * is for the Python publisher, which needs session-scoped advisory locks.
  */
-const url = process.env.DATABASE_URL;
+/**
+ * Created on first query, not at module load.
+ *
+ * Throwing at import time means the route function never starts, so a missing
+ * DATABASE_URL surfaces as an opaque platform 500 with nothing in the body --
+ * which is the least useful moment and the least useful message. Deferring it
+ * lets the error travel through the normal handler path and come back as a
+ * readable JSON envelope.
+ */
+let client: ReturnType<typeof neon> | null = null;
 
-if (!url) {
-  throw new Error(
-    'DATABASE_URL is not set. Put the pooled Neon connection string in ' +
-      '.env.local (local) or the Vercel project settings (deployed).',
-  );
+function connection(): ReturnType<typeof neon> {
+  if (client) return client;
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    throw new DatabaseNotConfigured(
+      'DATABASE_URL is not set. Put the pooled Neon connection string in ' +
+        '.env.local locally, or in the Vercel project settings for a ' +
+        'deployment -- for Preview as well as Production, since the build ' +
+        'reads it too.',
+    );
+  }
+  client = neon(url, { types });
+  return client;
 }
 
-export const sql = neon(url, { types });
+/** Recognised by the route wrapper, which turns it into a 503. */
+export class DatabaseNotConfigured extends Error {}
 
-/** Several independent queries in a single HTTP round trip. */
-export const tx = sql.transaction.bind(sql);
+export const sql = ((strings: TemplateStringsArray, ...values: unknown[]) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (connection() as any)(strings, ...values)) as ReturnType<typeof neon>;
 
 /**
  * Postgres int8/numeric arrive as JavaScript strings, which serialise into

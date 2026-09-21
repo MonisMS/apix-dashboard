@@ -1,4 +1,4 @@
-import { sql, num, isoDate } from './db';
+import { DatabaseNotConfigured, sql, num, isoDate } from './db';
 
 /** Matches api/main.py:42 — bump together with the Python reference impl. */
 export const API_VERSION = '1.0.0';
@@ -145,7 +145,13 @@ export function handler(fn: Handler) {
       const payload = await fn({ vintage, request, params, searchParams });
       return Response.json(envelope(vintage, payload));
     } catch (e) {
-      const err = e instanceof ApiError ? e : null;
+      // A missing connection string is a deployment problem, not a bug, and
+      // it should say so rather than arriving as a bare 500.
+      const configErr =
+        e instanceof DatabaseNotConfigured
+          ? new ApiError('DATABASE_NOT_CONFIGURED', (e as Error).message, 503)
+          : null;
+      const err = e instanceof ApiError ? e : configErr;
       const status = err?.status ?? 500;
       const body: Record<string, unknown> = err
         ? { code: err.code, message: err.message, detail: err.detail }

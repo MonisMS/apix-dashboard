@@ -4,8 +4,15 @@ import { API_VERSION, nowIst } from '@/server/envelope';
 // Liveness: never cached, and it must answer even when no vintage exists.
 export const dynamic = 'force-dynamic';
 
-/** Bump alongside apix/store/migrations/. */
-const EXPECTED_PG_SCHEMA = 3;
+/**
+ * The lowest schema version these handlers need. Compared with >=, not ==:
+ * a database ahead of this is fine (a migration landed before a deploy), a
+ * database behind it is not (the handlers query tables that do not exist yet).
+ *
+ * Bump this when a migration adds something the handlers actually read --
+ * 008 added observation_flag.ord, which /cleaning orders by.
+ */
+const EXPECTED_PG_SCHEMA = 8;
 
 export async function GET() {
   try {
@@ -30,7 +37,7 @@ export async function GET() {
     const run = (runRows as Record<string, unknown>[])[0] ?? null;
     const perm = (writeRows as Record<string, unknown>[])[0];
 
-    const ok = schema === EXPECTED_PG_SCHEMA && run !== null;
+    const ok = schema !== null && schema >= EXPECTED_PG_SCHEMA && run !== null;
 
     return Response.json({
       status: ok ? 'ok' : 'degraded',
@@ -39,7 +46,7 @@ export async function GET() {
       database: {
         backend: 'neon-postgres',
         schema_version: schema,
-        expected_schema_version: EXPECTED_PG_SCHEMA,
+        minimum_schema_version: EXPECTED_PG_SCHEMA,
         observations: num(obs.n),
         last_collected_at: obs.last,
         role: perm.role,
