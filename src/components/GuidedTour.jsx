@@ -1,5 +1,5 @@
 import { Joyride, STATUS } from 'react-joyride';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { TourTooltip } from './TourTooltip';
 
 /**
@@ -60,7 +60,7 @@ const OVERVIEW_STEPS = [
 ];
 
 export function GuidedTour({ run, onFinish, page = 'landing' }) {
-  const navigate = useNavigate();
+  const router = useRouter();
   // scrollOffset clears the sticky shortfall banner + header (~110px combined)
   // so a scrolled-to target doesn't land underneath them.
   const steps = (page === 'overview' ? OVERVIEW_STEPS : STEPS).map((s) => ({ ...s, scrollOffset: 120 }));
@@ -75,7 +75,7 @@ export function GuidedTour({ run, onFinish, page = 'landing' }) {
       onEvent={({ status }) => {
         if (status === STATUS.FINISHED) {
           onFinish?.();
-          if (page === 'landing') navigate('/overview');
+          if (page === 'landing') router.push('/overview');
           return;
         }
         if (status === STATUS.SKIPPED) {

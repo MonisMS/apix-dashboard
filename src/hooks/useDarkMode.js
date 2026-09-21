@@ -1,30 +1,28 @@
+'use client';
+
 import { useCallback, useEffect, useState } from 'react';
+import { useTheme } from 'next-themes';
 
-const KEY = 'apix-theme';
-
-function initial() {
-  try {
-    const stored = localStorage.getItem(KEY);
-    if (stored) return stored === 'dark';
-  } catch {
-    /* localStorage unavailable (private mode, etc.) -- fall through to system preference */
-  }
-  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
-}
-
-/** Class-based dark mode, persisted, defaulting to light per the plan's institutional-seriousness call. */
+/**
+ * Class-based dark mode, persisted. Backed by next-themes (see app/providers)
+ * rather than reading localStorage directly: the old version did that inside a
+ * useState initializer, which runs during render and throws on the server.
+ *
+ * The [dark, toggle] shape is unchanged so call sites did not have to move.
+ */
 export function useDarkMode() {
-  const [dark, setDark] = useState(initial);
+  const { resolvedTheme, setTheme } = useTheme();
 
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark);
-    try {
-      localStorage.setItem(KEY, dark ? 'dark' : 'light');
-    } catch {
-      /* ignore */
-    }
-  }, [dark]);
+  // The server cannot know the visitor's theme, so the first client render must
+  // match the server's. Report light until mounted, then flip.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const dark = mounted && resolvedTheme === 'dark';
 
-  const toggle = useCallback(() => setDark((d) => !d), []);
+  const toggle = useCallback(
+    () => setTheme(dark ? 'light' : 'dark'),
+    [dark, setTheme],
+  );
+
   return [dark, toggle];
 }

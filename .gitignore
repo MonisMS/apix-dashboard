@@ -1,2 +1,27 @@
 node_modules
 dist
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Vercel
+.vercel/
+
+# The static snapshot is generated from the live API by the prebuild step
+# (scripts/dump-static.ts), so every deployment carries a copy matching its
+# own data. Deliberately untracked: a committed snapshot goes stale silently
+# and becomes a trap the moment someone flips NEXT_PUBLIC_API_STATIC=1.
+public/data/v1/
+
+# Local secrets — never commit. .env.production is tracked on purpose: it holds
+# non-secret build config (static-mode flag and a relative path), not credentials.
+.env.local
+.env*.local
+
+# Python (arrives with backend/ in Phase B)
+__pycache__/
+*.pyc
+.pytest_cache/

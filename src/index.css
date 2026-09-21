@@ -5,6 +5,10 @@
 @import '@fontsource/ibm-plex-mono/400.css';
 @import '@fontsource/ibm-plex-mono/500.css';
 
+/* Tailwind v4 scans relative to this file, which lives in src/. Without this
+   the app/ tree is invisible to it and any class used only there is dropped. */
+@source "../app";
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*

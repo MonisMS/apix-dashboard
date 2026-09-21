@@ -1,63 +1,84 @@
-# APIx dashboard
+# APIx — a daily airfare price index for India
 
-    # terminal 1 — the API
-    cd /home/monis/sih2026
-    PYTHONPATH=.:api uvicorn api.main:app --reload --port 8000
+A Next.js monorepo: the dashboard, the API that serves it, and the Python
+pipeline that computes the index, in one deployable unit.
 
-    # terminal 2 — the dashboard
-    cd dashboard && npm install && npm run dev     # http://localhost:5173
+    npm install
+    npm run dev                    # http://localhost:3000
 
-Vite proxies `/api/v1` to uvicorn, so the browser sees one origin and CORS never
-comes up in development.
+Needs `DATABASE_URL` in `.env.local` (a Neon Postgres connection string).
+`npm run dev` and `npm run build` both talk to it: the build regenerates the
+static fallback snapshot before compiling.
 
-## Constraints this build follows
+## Layout
 
-**No custom CSS.** There is not one `.css` file of our own. The only two style
-imports are Mantine's, in `src/main.jsx`, and charts must come after core or
-tooltips misplace. Everything else is theme configuration (`src/theme.js`) and
-Mantine style props.
+    app/                   Next.js App Router
+      (console)/           the 17 dashboard routes, with the sidebar
+      api/v1/              19 GET endpoints + POST /ask
+    src/
+      views/               page components (not `pages/` -- Next reserves that)
+      server/              the API's data layer, TypeScript
+        services/          all the real work; routes are thin shims over these
+    backend/               Python: the index engine and the collector
+      apix/index/          Jevons / Young, screening, imputation, chaining
+      apix/store/          Postgres schema, publisher, verifier
+      api/                 the FastAPI reference implementation (not deployed)
+    scripts/dump-static.ts generates the static fallback from the live API
 
-**No custom components.** Every visual element is imported from `@mantine/core`
-or `@mantine/charts`. `src/state.jsx` holds two helper *functions* that return
-library elements — deliberately not components.
+## How the data flows
 
-**One gradient, three places:** the logo, the headline number in the right rail,
-and the area fill under the main chart.
+The index is **computed in Python and served by TypeScript**. Nothing
+recomputes an index level in JavaScript.
 
-## Design
+    collector ──> SQLite (per-run scratch) ──> Neon Postgres
+                                                  │
+                    apix.store.publish ───────────┤   writes a vintage:
+                    (runs the engine)             │   points, links, weights,
+                                                  │   digests
+                                                  ▼
+                            app/api/v1/** ──> the dashboard
 
-Shell and feel follow the lighter of the two reference designs — left nav, big
-heading, divider stat row, rounded pill controls, right-hand rail. The denser
-reference contributes the data displays: KPI cards with sparklines, range pills,
-the donut with a value legend, the stacked quality bar.
+Each publish writes a complete new *vintage* inside one transaction and flips
+it to `PUBLISHED` at the end; the previous one becomes `SUPERSEDED`. A reader
+mid-publish sees the old vintage whole, never a half-written one.
 
-Dropped from both as irrelevant to a price index: avatars, chat, activity feeds
-of people, "Upgrade to Pro", revenue/customers/deals, tasks.
+Every published point carries a `repro_hash` — a digest over the exact cell
+links and weights behind it. `python3 -m apix.store.verify` recomputes all of
+them from stored rows, so the numbers are falsifiable rather than asserted.
 
-## Routes
+## The static fallback
 
-| Path | Page |
-|---|---|
-| `/` | Overview — headline, stat row, series, basket, movers, quality |
-| `/index` | Every published point, flags, transitivity audit |
-| `/routes`, `/routes/:pair` | All basket routes; per-route series, carriers, fare spread |
-| `/carriers` | Per-carrier index and share |
-| `/windows` | The five advance-purchase sub-indices and the lead-time curve |
-| `/heatmap` | Route × day matrix (the PS's sector heatmap) |
-| `/weights` | Expenditure-share basket and CPI context |
-| `/validation` | MoSPI comparison, and why it cannot be made yet |
-| `/tariffs` | Rule-135 published fare ladders |
-| `/data` | Coverage, sweeps, the collection-hour warning |
-| `/methodology` | Formulas, citations, MoSPI's worked examples |
-| `/api-docs` | Endpoint reference |
+`public/data/v1/` is a frozen copy of the live API, generated at build time
+and **not committed**. It exists for one situation: the database is
+unreachable during judging. Set `NEXT_PUBLIC_API_STATIC=1` and redeploy, and
+the dashboard serves files instead of Postgres.
 
-`/api-docs`, not `/api`: the dev proxy matches path prefixes, so an `/api` route
-would be forwarded to uvicorn instead of the app.
+It is generated from the same service functions the API routes use, so it
+cannot disagree with them — an earlier version was produced by a separate
+Python program and drifted.
 
-## Honest states
+## Commands
 
-Pages show what is missing rather than hiding it: the 8 basket routes with no
-fares appear in the table with a "not collected" badge; weekly and monthly tabs
-are disabled with the reason; `/validation` leads with the fact that the two
-series do not overlap. A blank card on a demo screen reads as a broken product,
-so every page has a skeleton while loading and a specific message on failure.
+    npm run dev                 dashboard + API
+    npm run build               regenerates the snapshot, then builds
+    npm run dump:static         regenerate the snapshot by hand
+    npm run dump:static -- --check   is the snapshot behind the database?
+
+From `backend/`, with `APIX_PG_URL` set:
+
+    python3 -m apix.store.migrate_pg     apply schema migrations
+    python3 -m apix.store.publish        compute and publish a vintage
+    python3 -m apix.store.verify         recompute every published digest
+    python3 -m apix.store.inspect        what is actually in the database
+    python3 -m apix.store.api_parity     live API vs the snapshot
+
+## Collection
+
+`.github/workflows/collect.yml` runs daily: sweep fares, sync to Neon,
+publish a vintage, verify the digests, commit a compressed raw backup, and
+trigger a rebuild so the fallback snapshot keeps up.
+
+GitHub's scheduler runs this late — hours late, some days. `collected_at`
+always records the real time, and `/api/v1/collection` publishes the drift per
+day, so the gap between the nominal slot and reality is visible rather than
+hidden. Part of any day-on-day move is the clock, not the market.

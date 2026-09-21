@@ -1,0 +1,230 @@
+name: APIx daily fare collection
+
+# Runs every day at ~10:43 IST (05:13 UTC).
+#
+# A fixed collection hour matters: comparing a fare captured at 9am against
+# one captured at 11pm would measure the clock, not the market.
+#
+# Why mid-morning:
+#   - Overnight fare loads have settled and the day's inventory is open, so a
+#     sweep here is representative of what a traveller booking in business
+#     hours actually sees.
+#   - Well clear of the midnight-IST window when airlines reload fare buckets,
+#     which is the least stable hour to measure in.
+#
+# Why :13 and not :15 or :00 -- and why that is not really the fix:
+#   GitHub delays scheduled runs when load peaks, worst on the hour and on
+#   common minutes. This repo has been hit hard: 4h44m late on 13 Sep 2026
+#   (then never allocated a runner at all), and progressively worse through
+#   September -- +259, +276, +333 minutes on the 19th, 20th and 21st. An
+#   unusual minute helps at the margin; it does not fix deprioritisation.
+#
+#   The real fix is to stop relying on `schedule`. A workflow_dispatch run is
+#   queued immediately rather than best-effort, so an external scheduler
+#   (cron-job.org, a Vercel cron, anything that can make one HTTPS call) that
+#   POSTs to the dispatch API at 05:13 UTC will start on time:
+#
+#     POST https://api.github.com/repos/MonisMS/apix-dashboard/actions/workflows/collect.yml/dispatches
+#     Authorization: Bearer <fine-grained PAT with actions:write>
+#     {"ref":"main"}
+#
+#   Keep the schedule below as a backstop for when the external trigger fails.
+#
+# collected_at always records the real time, so drift stays visible rather
+# than hidden -- /api/v1/collection publishes drift_minutes per day.
+on:
+  schedule:
+    - cron: "13 5 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Check keys and plumbing without spending any credit"
+        type: boolean
+        default: false
+      smoke_test:
+        description: "Really fetch 1 route into a throwaway DB (5 credits, series untouched)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write           # to commit the daily raw backup
+
+concurrency:
+  group: apix-collect       # never let two runs collide
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend    # `python -m apix...` resolves from here
+
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install what we need
+        run: pip install --quiet requests "psycopg[binary]"
+
+      # SQLite is a scratch buffer for this run, not the archive. Neon holds
+      # the full history; the collector writes today's rows here and they are
+      # synced across in the next step. Dedup happens at the Neon end, on the
+      # natural key, so a re-run adds nothing twice.
+      # Two steps, not one: migrate.py only applies numbered migrations and
+      # assumes the base schema exists. apix.db.connect() is what creates it.
+      - name: Prepare today's scratch database
+        if: inputs.smoke_test != true
+        env:
+          APIX_DB: /tmp/apix-today.db
+        run: |
+          python -c "from apix import db; db.connect().close()"
+          python apix/migrate.py --db /tmp/apix-today.db
+
+      # Every key in the pool. The collector picks whichever has the most
+      # credit left, so a spent key degrades the run instead of killing it.
+      - name: Collect today's fares
+        id: collect
+        continue-on-error: true      # save the data first, judge the run after
+        env:
+          APIX_DB: /tmp/apix-today.db
+          APIX_SERPAPI_KEY:   ${{ secrets.APIX_SERPAPI_KEY }}
+          APIX_SERPAPI_KEY_2: ${{ secrets.APIX_SERPAPI_KEY_2 }}
+          APIX_SERPAPI_KEY_3: ${{ secrets.APIX_SERPAPI_KEY_3 }}
+          APIX_SERPAPI_KEY_4: ${{ secrets.APIX_SERPAPI_KEY_4 }}
+          APIX_SERPAPI_LABEL_2: friend
+          APIX_SERPAPI_LABEL_3: friend2
+          APIX_SERPAPI_LABEL_4: friend3
+          APIX_TP_TOKEN:      ${{ secrets.APIX_TP_TOKEN }}
+        run: |
+          if [ "${{ inputs.smoke_test }}" = "true" ]; then
+            export APIX_DB=/tmp/apix-smoke.db
+            echo "SMOKE TEST -> $APIX_DB (real series untouched)"
+            python apix/migrate.py --db /tmp/apix-smoke.db
+            python apix/collect.py --routes 1
+          else
+            python apix/collect.py ${{ inputs.dry_run && '--dry-run' || '' }}
+          fi
+
+      # `if: always()` on purpose: fares cannot be re-fetched later, so even a
+      # partial sweep must reach Neon. An index can always be recomputed; a
+      # missing hour of prices is gone for good.
+      - name: Sync today's rows into Neon
+        if: always() && inputs.smoke_test != true && inputs.dry_run != true
+        env:
+          APIX_PG_URL: ${{ secrets.NEON_DIRECT_URL }}
+        # No --preserve-ids: the scratch database restarts ids at 1, and
+        # forcing those onto Neon would collide with existing rows and drop
+        # today's fares silently. Incremental mode lets Postgres assign ids
+        # and deduplicates on the natural key instead. (--preserve-ids is for
+        # the one-time full backfill, where flag/observation links matter.)
+        run: |
+          python -m apix.store.migrate_pg
+          python -m apix.store.backfill_pg --sqlite /tmp/apix-today.db
+
+      # Recomputes the whole series from Neon and writes a new vintage. The
+      # previous one becomes SUPERSEDED in the same transaction, so a reader
+      # mid-publish sees the old vintage whole rather than a half-written one.
+      #
+      # Gated on the sweep succeeding, unlike the sync above. The two have
+      # opposite failure preferences: an unsaved fare is lost forever, so sync
+      # runs regardless; a vintage built from half a basket would supersede a
+      # complete one, so publication waits for a clean run. Yesterday's
+      # correct index beats today's partial one.
+      - name: Publish the index vintage
+        if: steps.collect.outcome == 'success'
+             && inputs.smoke_test != true && inputs.dry_run != true
+        env:
+          APIX_PG_URL: ${{ secrets.NEON_DIRECT_URL }}
+        run: python -m apix.store.publish --git-sha "$GITHUB_SHA"
+
+      # Recomputes every published digest from the stored elementary rows. A
+      # mismatch means the number on the dashboard cannot be reproduced from
+      # the data behind it, which must be loud, not logged.
+      - name: Verify the published digests
+        if: always() && inputs.smoke_test != true && inputs.dry_run != true
+        env:
+          APIX_PG_URL: ${{ secrets.NEON_DIRECT_URL }}
+        run: python -m apix.store.verify
+
+      # Neon is now the system of record, so it is also a single point of
+      # failure for data that cannot be re-collected. This commits a small
+      # compressed copy of today's raw observations as an offline backup --
+      # enough to rebuild Neon from scratch if it is ever lost.
+      - name: Commit today's raw backup
+        id: backup
+        if: always() && inputs.smoke_test != true && inputs.dry_run != true
+        run: |
+          mkdir -p apix/exports/raw
+          DAY=$(date -u +%Y-%m-%d)
+          python - "$DAY" <<'PY'
+          import csv, gzip, pathlib, sqlite3, sys
+          day = sys.argv[1]
+          src = sqlite3.connect("file:/tmp/apix-today.db?mode=ro", uri=True)
+          src.row_factory = sqlite3.Row
+          rows = src.execute("SELECT * FROM fare_observation").fetchall()
+          out = pathlib.Path("apix/exports/raw") / f"{day}.csv.gz"
+          if not rows:
+              print("no rows collected; nothing to back up")
+              raise SystemExit(0)
+          with gzip.open(out, "wt", newline="") as f:
+              w = csv.DictWriter(f, fieldnames=rows[0].keys())
+              w.writeheader()
+              w.writerows(dict(r) for r in rows)
+          print(f"backed up {len(rows)} rows -> {out} ({out.stat().st_size // 1024} KB)")
+          PY
+          cd "$GITHUB_WORKSPACE"
+          git config user.name  "apix-collector"
+          git config user.email "apix-collector@users.noreply.github.com"
+          git add -f backend/apix/exports/raw/
+          if git diff --staged --quiet; then
+            echo "Nothing new collected today - not committing."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "data: fare collection $(date -u +%Y-%m-%d)"
+            git pull --rebase --autostash
+            git push
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Rebuilds the site so the static fallback snapshot (regenerated from
+      # the live API by the prebuild step) matches the vintage just published.
+      # Without a rebuild the fallback drifts a day behind, every day.
+      #
+      # Only runs when the backup step pushed nothing: a push to the default
+      # branch already triggers a Vercel build, and firing the hook as well
+      # would queue a second, identical one.
+      - name: Trigger a Vercel deploy
+        if: always() && inputs.smoke_test != true && inputs.dry_run != true
+             && steps.backup.outputs.pushed != 'true'
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::warning::VERCEL_DEPLOY_HOOK_URL is not set and nothing was"
+            echo "::warning::pushed, so the deployed fallback snapshot still"
+            echo "::warning::reflects an older vintage."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK" -o /dev/null && echo "deploy triggered"
+
+      - name: Print a summary
+        if: always() && inputs.smoke_test != true && inputs.dry_run != true
+        env:
+          APIX_PG_URL: ${{ secrets.NEON_DIRECT_URL }}
+        run: python -m apix.store.inspect | head -30
+
+      # The data is safely in Neon and committed above, so failing here loses
+      # nothing. A day that collected nothing, or only part of the basket,
+      # must show up as a red X. A green tick over a gap is how a series rots.
+      - name: Fail the run if the sweep was incomplete
+        if: steps.collect.outcome != 'success'
+        run: |
+          echo "::error::Collection did not complete. Today's cell coverage is short - check the log above."
+          exit 1
