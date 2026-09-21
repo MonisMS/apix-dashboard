@@ -273,7 +273,7 @@ export default function Landing() {
         {showShortfall && <ShortfallBar point={last} onDismiss={() => setNoticeDismissed(true)} />}
 
         <header className="border-b border-border bg-background">
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-3 px-5 py-2.5 md:px-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 px-5 py-2.5 md:px-6 lg:justify-start">
             <Link href="/" className="flex shrink-0 items-center gap-2.5">
               <LogoMark />
               <span className="leading-tight">
@@ -284,7 +284,7 @@ export default function Landing() {
               </span>
             </Link>
 
-            <nav aria-label="Primary" className="hidden lg:flex">
+            <nav aria-label="Primary" className="flex">
               <Link
                 href="/overview"
                 data-tour="nav-dashboard"
@@ -294,7 +294,7 @@ export default function Landing() {
               </Link>
             </nav>
 
-            <div className="ml-auto flex shrink-0 items-center gap-5">
+            <div className="flex shrink-0 items-center gap-3 sm:gap-5 lg:ml-auto">
               <AskAI
                 trigger={
                   <Button

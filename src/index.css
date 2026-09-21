@@ -184,6 +184,20 @@
   .skip-link {
     @apply sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground;
   }
+  /* Tailwind v4's preflight resets buttons to cursor:default, so nothing in
+     the app showed a pointer on hover. Restore it for everything that is
+     actually clickable, and keep the not-allowed affordance on disabled
+     controls. */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  summary,
+  label[for] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [role='button'][aria-disabled='true'] {
+    cursor: not-allowed;
+  }
   .tabular {
     font-variant-numeric: tabular-nums;
     font-family: var(--font-mono);

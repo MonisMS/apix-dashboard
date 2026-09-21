@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu,
-  SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger,
+  SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,
 } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/sonner';
@@ -132,6 +132,42 @@ function AsideSummary() {
   );
 }
 
+/**
+ * The sidebar links.
+ *
+ * Split out of AppLayout so it can call useSidebar(), which has to run below
+ * the provider. On a phone the sidebar is an overlay sheet, and picking a
+ * destination used to leave it open on top of the page you had just asked
+ * for -- you had to tap empty space to dismiss it. Choosing something is an
+ * unambiguous signal you are done with the menu, so it closes itself.
+ */
+function SidebarNav({ pathname }) {
+  const { isMobile, setOpenMobile } = useSidebar();
+  const dismissOnMobile = () => {
+    if (isMobile) setOpenMobile(false);
+  };
+
+  return NAV.map((group) => (
+    <SidebarGroup key={group.label}>
+      <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {group.items.map(({ to, label, icon: Icon }) => (
+            <SidebarMenuItem key={to}>
+              <SidebarMenuButton asChild isActive={isActive(pathname, to)}>
+                <Link href={to} onClick={dismissOnMobile}>
+                  <Icon aria-hidden="true" />
+                  <span>{label}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  ));
+}
+
 export default function AppLayout({ children }) {
   const { start: startTour } = useTour();
   const pathname = usePathname();
@@ -148,25 +184,7 @@ export default function AppLayout({ children }) {
           </Link>
         </SidebarHeader>
         <SidebarContent>
-          {NAV.map((group) => (
-            <SidebarGroup key={group.label}>
-              <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {group.items.map(({ to, label, icon: Icon }) => (
-                    <SidebarMenuItem key={to}>
-                      <SidebarMenuButton asChild isActive={isActive(pathname, to)}>
-                        <Link href={to}>
-                          <Icon aria-hidden="true" />
-                          <span>{label}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          ))}
+          <SidebarNav pathname={pathname} />
         </SidebarContent>
         <SidebarFooter className="px-3 py-3 text-xs text-muted-foreground">
           <p>SIH26056 · MoSPI</p>
