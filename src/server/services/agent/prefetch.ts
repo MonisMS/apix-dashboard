@@ -20,7 +20,7 @@
  */
 
 /** At most this many tools are prefetched, to bound the added latency. */
-const MAX_PREFETCH = 2;
+const MAX_PREFETCH = 3;
 
 interface Rule {
   test: RegExp;
@@ -42,6 +42,13 @@ const RULES: Rule[] = [
   { test: /\bcarrier|\bairline|\bindigo\b|\bvistara\b|\bspicejet\b|\bair india\b/i, tools: ['list_carriers'] },
   { test: /\bcheapest|most expensive|priciest|lowest fare|highest fare|compare.{0,20}routes?\b/i, tools: ['list_routes'] },
   { test: /\bheadline\b|\bindex level\b|\bcurrent index\b|\bhow (is|has) the index\b|\btoday'?s level\b/i, tools: ['get_headline_index'] },
+  // "walk me through how the index is calculated" reaches past methodology
+  // into weights and coverage; giving it only the formulas is what let it
+  // invent a reference window length and a claim about MoSPI publishing.
+  {
+    test: /\bend to end\b|\bworkflow\b|\bstart to (end|finish)\b|\bwhole process\b|\bstep by step\b|how do (you|we) (calculate|compute|build)/i,
+    tools: ['get_methodology', 'get_weights', 'get_headline_index'],
+  },
   { test: /\bjevons\b|\byoung\b|\bformula|\bmethodolog|how (is|are) the index (built|computed|calculated)/i, tools: ['get_methodology'] },
   { test: /\bbooking window|\blead time|\badvance (purchase|booking)|\bt\+\d+/i, tools: ['get_booking_windows'] },
   { test: /\bweight|\bbasket\b|\bexpenditure share/i, tools: ['get_weights'] },

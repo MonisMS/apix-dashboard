@@ -62,10 +62,18 @@ function Bubble({ message }) {
                 ))}
               </div>
             )}
-            {message.note && (
+            {/* The tier still has to be visible -- a canned answer must never
+                pass as a generated one -- but the model id and the tool count
+                are plumbing. The fallback keeps its full note, because there
+                the reason is the point. */}
+            {(message.tier === 'model' ? true : !!message.note) && (
               <div className="flex items-start gap-1 text-[11px] text-muted-foreground">
                 <CheckCircle2 className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
-                <span>{message.note}</span>
+                <span>
+                  {message.tier === 'model'
+                    ? 'Generated from the live index data.'
+                    : message.note}
+                </span>
               </div>
             )}
           </div>
@@ -81,9 +89,17 @@ export default function AskAI({ trigger }) {
   const [messages, setMessages] = useState([]);
   const ask = useAsk();
   const bottomRef = useRef(null);
+  const lastAskRef = useRef(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // While thinking, follow the bottom. Once the answer lands, put the
+    // question back at the top of the view: scrolling to the end of a long
+    // reply left no sign of what had been asked.
+    if (ask.isPending) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else if (messages.length) {
+      lastAskRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }, [messages, ask.isPending]);
 
   function send(question) {
@@ -132,7 +148,7 @@ export default function AskAI({ trigger }) {
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent side="right" className="flex w-full flex-col gap-0 sm:max-w-lg lg:max-w-xl">
+      <SheetContent side="right" className="flex w-full flex-col gap-0 sm:max-w-xl lg:max-w-2xl xl:max-w-3xl">
         <SheetHeader className="shrink-0 border-b border-border">
           <SheetTitle className="flex items-center gap-1.5">
             <CopilotIcon size={20} thinking={ask.isPending} /> AskAI
@@ -170,9 +186,16 @@ export default function AskAI({ trigger }) {
                 </div>
               </div>
             )}
-            {messages.map((m, i) => (
-              <Bubble key={i} message={m} />
-            ))}
+            {messages.map((m, i) => {
+              const isLastAsk =
+                m.role === 'user' &&
+                !messages.slice(i + 1).some((x) => x.role === 'user');
+              return (
+                <div key={i} ref={isLastAsk ? lastAskRef : undefined} className="scroll-mt-2">
+                  <Bubble message={m} />
+                </div>
+              );
+            })}
             {ask.isPending && (
               <div className="flex justify-start">
                 <div className="flex items-center gap-2 bg-accent px-3 py-2 text-sm text-muted-foreground">
