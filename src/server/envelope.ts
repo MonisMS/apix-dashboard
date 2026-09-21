@@ -143,7 +143,25 @@ export function handler(fn: Handler) {
       const vintage = await loadVintage();
       const { searchParams } = new URL(request.url);
       const payload = await fn({ vintage, request, params, searchParams });
-      return Response.json(envelope(vintage, payload));
+      const res = Response.json(envelope(vintage, payload));
+      // Each route declares `export const revalidate`, but that never took
+      // effect: this wrapper reads request.url for searchParams, which marks
+      // every route dynamic, so Next skipped its cache entirely and Vercel
+      // reported x-vercel-cache: MISS on every single request. Every dashboard
+      // page therefore round-tripped to Neon on every navigation.
+      //
+      // Set the header explicitly instead, which the CDN honours regardless of
+      // the dynamic flag. The index is recomputed once a day by the Python
+      // publisher, so a minute of edge staleness cannot show a wrong number --
+      // and `served_at` in the envelope still reports when this copy was
+      // built. POST (/ask) is excluded: it is never cacheable.
+      if (request.method === 'GET') {
+        res.headers.set(
+          'Cache-Control',
+          'public, s-maxage=60, stale-while-revalidate=300',
+        );
+      }
+      return res;
     } catch (e) {
       // A missing connection string is a deployment problem, not a bug, and
       // it should say so rather than arriving as a bare 500.

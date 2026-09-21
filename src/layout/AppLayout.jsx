@@ -2,19 +2,20 @@
 
 import {
   Calculator, ChartArea, ChartBar, Clock, CloudDownload, EyeOff, Filter,
-  Grid3x3, Moon, PlaneTakeoff, Receipt, ReceiptText, Route, Scale, Server,
-  Sun, Target,
+  Grid3x3, Moon, PlaneTakeoff, Play, Receipt, ReceiptText, Route, Scale,
+  Server, Sun, Target,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu,
-  SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger,
+  SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar,
 } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/sonner';
 import AskAI from '../components/AskAI';
+import { useTour } from '../components/tour/TourContext';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { useCollection, useIndex } from '../api';
 import { count, idx, sharePct, shortDate } from '../format';
@@ -131,7 +132,44 @@ function AsideSummary() {
   );
 }
 
+/**
+ * The sidebar links.
+ *
+ * Split out of AppLayout so it can call useSidebar(), which has to run below
+ * the provider. On a phone the sidebar is an overlay sheet, and picking a
+ * destination used to leave it open on top of the page you had just asked
+ * for -- you had to tap empty space to dismiss it. Choosing something is an
+ * unambiguous signal you are done with the menu, so it closes itself.
+ */
+function SidebarNav({ pathname }) {
+  const { isMobile, setOpenMobile } = useSidebar();
+  const dismissOnMobile = () => {
+    if (isMobile) setOpenMobile(false);
+  };
+
+  return NAV.map((group) => (
+    <SidebarGroup key={group.label}>
+      <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {group.items.map(({ to, label, icon: Icon }) => (
+            <SidebarMenuItem key={to}>
+              <SidebarMenuButton asChild isActive={isActive(pathname, to)}>
+                <Link href={to} onClick={dismissOnMobile}>
+                  <Icon aria-hidden="true" />
+                  <span>{label}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  ));
+}
+
 export default function AppLayout({ children }) {
+  const { start: startTour } = useTour();
   const pathname = usePathname();
   const { data: index } = useIndex();
 
@@ -146,25 +184,7 @@ export default function AppLayout({ children }) {
           </Link>
         </SidebarHeader>
         <SidebarContent>
-          {NAV.map((group) => (
-            <SidebarGroup key={group.label}>
-              <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {group.items.map(({ to, label, icon: Icon }) => (
-                    <SidebarMenuItem key={to}>
-                      <SidebarMenuButton asChild isActive={isActive(pathname, to)}>
-                        <Link href={to}>
-                          <Icon aria-hidden="true" />
-                          <span>{label}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          ))}
+          <SidebarNav pathname={pathname} />
         </SidebarContent>
         <SidebarFooter className="px-3 py-3 text-xs text-muted-foreground">
           <p>SIH26056 · MoSPI</p>
@@ -187,11 +207,24 @@ export default function AppLayout({ children }) {
                 {index.reference.label}
               </p>
             )}
+            {/* Restartable from any console page: a judge can interrupt on
+                /cleaning and still be walked through from the beginning. */}
+            <button
+              type="button"
+              onClick={startTour}
+              aria-label="Start the guided tour"
+              className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-none border border-border px-2 text-xs text-muted-foreground hover:bg-accent hover:text-foreground sm:px-2.5"
+            >
+              <Play className="h-3.5 w-3.5" aria-hidden="true" />
+              {/* Icon-only on a phone: it was hidden entirely below sm, which
+                  left no way to restart the tour from inside the console. */}
+              <span className="hidden sm:inline">Tour</span>
+            </button>
             <ThemeToggle />
           </div>
         </header>
         <main id="main-content" className="flex flex-1">
-          <div className="apix-main mx-auto w-full max-w-[70rem] flex-1 p-4 md:p-6">
+          <div className="apix-main mx-auto w-full max-w-[70rem] flex-1 p-4 pb-24 md:p-6 md:pb-6">
             {children}
           </div>
           <AsideSummary />

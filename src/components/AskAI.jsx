@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { renderMarkdown } from './askai-markdown';
 import { useAsk } from '../api';
 import { CopilotIcon } from './CopilotIcon';
 
@@ -34,64 +35,6 @@ function toolLabel(name) {
   return name.replace(/^get_|^list_/, '').replace(/_/g, ' ');
 }
 
-/** Minimal markdown: headings, bold, inline code, bullet lists. Answers come
- * back with real markdown from the model (or the local knowledge base), and
- * rendering it beats showing literal asterisks. */
-function renderMarkdown(text) {
-  const lines = String(text || '').split('\n');
-  const blocks = [];
-  let listItems = [];
-
-  const flushList = () => {
-    if (listItems.length) {
-      blocks.push(
-        <ul key={`ul-${blocks.length}`} className="ml-4 list-disc space-y-0.5">
-          {listItems.map((item, i) => (
-            <li key={i} dangerouslySetInnerHTML={{ __html: inline(item) }} />
-          ))}
-        </ul>,
-      );
-      listItems = [];
-    }
-  };
-
-  const inline = (s) =>
-    s
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/`([^`]+)`/g, '<code class="rounded-none bg-foreground/10 px-1 py-0.5 font-mono text-[0.9em]">$1</code>')
-      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*([^*]+)\*/g, '<em>$1</em>');
-
-  for (const raw of lines) {
-    const line = raw.trimEnd();
-    if (!line.trim()) {
-      flushList();
-      continue;
-    }
-    if (line.startsWith('- ') || line.startsWith('* ')) {
-      listItems.push(line.slice(2));
-      continue;
-    }
-    flushList();
-    const heading = line.match(/^(#{1,4})\s+(.*)$/);
-    if (heading) {
-      blocks.push(
-        <p
-          key={`h-${blocks.length}`}
-          className="font-semibold"
-          dangerouslySetInnerHTML={{ __html: inline(heading[2]) }}
-        />,
-      );
-      continue;
-    }
-    blocks.push(<p key={`p-${blocks.length}`} dangerouslySetInnerHTML={{ __html: inline(line) }} />);
-  }
-  flushList();
-  return blocks;
-}
-
 function Bubble({ message }) {
   const isUser = message.role === 'user';
   const isError = message.role === 'error';
@@ -99,7 +42,9 @@ function Bubble({ message }) {
     <div className={cn('flex', isUser ? 'justify-end' : 'justify-start')}>
       <div
         className={cn(
-          'max-w-[85%] px-3 py-2 text-sm',
+          'px-3 py-2 text-sm',
+          // Tables and figures need room; only the user's own text is inset.
+          isUser || isError ? 'max-w-[85%]' : 'w-full min-w-0',
           isUser && 'whitespace-pre-wrap bg-primary text-primary-foreground',
           !isUser && !isError && 'bg-accent text-accent-foreground [&_p+p]:mt-2',
           isError && 'whitespace-pre-wrap border border-destructive/40 bg-destructive/10 text-destructive',
@@ -117,10 +62,18 @@ function Bubble({ message }) {
                 ))}
               </div>
             )}
-            {message.note && (
+            {/* The tier still has to be visible -- a canned answer must never
+                pass as a generated one -- but the model id and the tool count
+                are plumbing. The fallback keeps its full note, because there
+                the reason is the point. */}
+            {(message.tier === 'model' ? true : !!message.note) && (
               <div className="flex items-start gap-1 text-[11px] text-muted-foreground">
                 <CheckCircle2 className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
-                <span>{message.note}</span>
+                <span>
+                  {message.tier === 'model'
+                    ? 'Generated from the live index data.'
+                    : message.note}
+                </span>
               </div>
             )}
           </div>
@@ -136,9 +89,17 @@ export default function AskAI({ trigger }) {
   const [messages, setMessages] = useState([]);
   const ask = useAsk();
   const bottomRef = useRef(null);
+  const lastAskRef = useRef(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // While thinking, follow the bottom. Once the answer lands, put the
+    // question back at the top of the view: scrolling to the end of a long
+    // reply left no sign of what had been asked.
+    if (ask.isPending) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else if (messages.length) {
+      lastAskRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }, [messages, ask.isPending]);
 
   function send(question) {
@@ -187,8 +148,8 @@ export default function AskAI({ trigger }) {
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent side="right" className="flex w-full flex-col sm:max-w-md">
-        <SheetHeader className="border-b border-border">
+      <SheetContent side="right" className="flex w-full flex-col gap-0 sm:max-w-xl lg:max-w-2xl xl:max-w-3xl">
+        <SheetHeader className="shrink-0 border-b border-border">
           <SheetTitle className="flex items-center gap-1.5">
             <CopilotIcon size={20} thinking={ask.isPending} /> AskAI
           </SheetTitle>
@@ -199,13 +160,13 @@ export default function AskAI({ trigger }) {
         </SheetHeader>
 
         {STATIC && (
-          <div className="mx-4 border border-border bg-accent px-3 py-2 text-xs text-muted-foreground">
+          <div className="mx-4 my-2 shrink-0 border border-border bg-accent px-3 py-2 text-xs text-muted-foreground">
             This is a static demo snapshot with no live API behind it, so AskAI can&rsquo;t run
             here. It works against a locally running backend.
           </div>
         )}
 
-        <ScrollArea className="flex-1 px-4">
+        <ScrollArea className="min-h-0 flex-1 px-4">
           <div className="flex flex-col gap-3 py-2">
             {messages.length === 0 && (
               <div className="flex flex-col gap-2">
@@ -225,9 +186,16 @@ export default function AskAI({ trigger }) {
                 </div>
               </div>
             )}
-            {messages.map((m, i) => (
-              <Bubble key={i} message={m} />
-            ))}
+            {messages.map((m, i) => {
+              const isLastAsk =
+                m.role === 'user' &&
+                !messages.slice(i + 1).some((x) => x.role === 'user');
+              return (
+                <div key={i} ref={isLastAsk ? lastAskRef : undefined} className="scroll-mt-2">
+                  <Bubble message={m} />
+                </div>
+              );
+            })}
             {ask.isPending && (
               <div className="flex justify-start">
                 <div className="flex items-center gap-2 bg-accent px-3 py-2 text-sm text-muted-foreground">
@@ -240,8 +208,26 @@ export default function AskAI({ trigger }) {
           </div>
         </ScrollArea>
 
+        {messages.length > 0 && !ask.isPending && (
+          <div className="shrink-0 overflow-x-auto border-t border-border px-4 py-2">
+            <div className="flex w-max gap-1.5">
+              {SUGGESTIONS.map((sug) => (
+                <button
+                  key={sug}
+                  type="button"
+                  onClick={() => send(sug)}
+                  disabled={STATIC}
+                  className="whitespace-nowrap border border-border px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
+                >
+                  {sug}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <form
-          className="flex items-center gap-2 border-t border-border p-4"
+          className="shrink-0 flex items-center gap-2 border-t border-border p-4"
           onSubmit={(e) => {
             e.preventDefault();
             send();

@@ -337,16 +337,34 @@ export function SegmentedControl({ value, onChange, data = [], size, className, 
 
 /* ---- Table ---- */
 
-export function Table({ children, striped, layout, className, style, ...rest }) {
+export function Table({
+  children, striped, layout, className, style,
+  // Consumed, not forwarded: these are Mantine spacing props with no effect
+  // here (Th/Td carry their own padding), and spreading them onto <table>
+  // made React warn "does not recognize the verticalSpacing prop" on every
+  // page that renders a table.
+  verticalSpacing, horizontalSpacing, variant, withTableBorder,
+  ...rest
+}) {
   const { style: s, rest: r } = splitProps(rest);
   return (
-    <table
-      className={cn('w-full border-collapse text-sm', striped && 'apix-table-striped', className)}
-      style={{ tableLayout: layout, ...s, ...style }}
-      {...r}
-    >
-      {children}
-    </table>
+    // Every table scrolls horizontally WITHIN its own card, never the page.
+    // The forced minWidth wrappers were removed because they made desktop
+    // tables scroll sideways for no reason; without any wrapper, though, a
+    // table wider than a phone was simply clipped by the card's
+    // overflow-x:hidden, so on /carriers the day-on-day column sat at 728px
+    // in a 376px viewport with no way to reach it. An auto wrapper with no
+    // min-width gives both: nothing to scroll on a desktop, a scrollable
+    // table on a phone.
+    <div className="w-full max-w-full overflow-x-auto">
+      <table
+        className={cn('w-full border-collapse text-sm', striped && 'apix-table-striped', className)}
+        style={{ tableLayout: layout, ...s, ...style }}
+        {...r}
+      >
+        {children}
+      </table>
+    </div>
   );
 }
 Table.Thead = function Thead({ children }) {
@@ -408,9 +426,16 @@ export function Tabs({ defaultValue, children }) {
   const [value, setValue] = React.useState(defaultValue);
   return <TabsCtx.Provider value={{ value, setValue }}>{children}</TabsCtx.Provider>;
 }
-Tabs.List = function TabsList({ children, mb, className }) {
+Tabs.List = function TabsList({ children, mb, className, ...rest }) {
+  // Forwards the remaining props like every other wrapper here. It used to
+  // drop them, so a data-* attribute put on a Tabs.List never reached the DOM.
+  const { style: s, rest: r } = splitProps(rest);
   return (
-    <div className={cn('flex gap-1 border-b border-border', className)} style={boxStyle({ mb })}>
+    <div
+      className={cn('flex gap-1 border-b border-border', className)}
+      style={{ ...boxStyle({ mb }), ...s }}
+      {...r}
+    >
       {children}
     </div>
   );

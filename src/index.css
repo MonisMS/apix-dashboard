@@ -184,6 +184,20 @@
   .skip-link {
     @apply sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground;
   }
+  /* Tailwind v4's preflight resets buttons to cursor:default, so nothing in
+     the app showed a pointer on hover. Restore it for everything that is
+     actually clickable, and keep the not-allowed affordance on disabled
+     controls. */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  summary,
+  label[for] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [role='button'][aria-disabled='true'] {
+    cursor: not-allowed;
+  }
   .tabular {
     font-variant-numeric: tabular-nums;
     font-family: var(--font-mono);
@@ -241,7 +255,8 @@
  * reserved for data and the chrome monochrome. --primary is the ink itself,
  * so interaction has no accent hue of its own.
  */
-.landing-theme {
+.landing-theme,
+body:has(.landing-theme) #react-joyride-portal {
   --background: #f7f5f0;
   --foreground: #191917;
 
@@ -289,7 +304,8 @@
  * explicit toggle to light is not overridden by the OS here.
  */
 .dark .landing-theme,
-.landing-theme.dark {
+.landing-theme.dark,
+.dark body:has(.landing-theme) #react-joyride-portal {
   --background: #151815;
   --foreground: #f3f1e9;
 
@@ -366,12 +382,21 @@
   .landing-hero {
     min-height: 0;
   }
-  .landing-globe {
-    order: 1;
-    min-height: 280px;
-  }
+  /* Copy first, decoration second. These orders were the other way round, so
+     on a phone the globe filled the whole first screen and the headline --
+     the one thing a visitor needs -- started below the fold. */
   .landing-copy {
+    order: 1;
+  }
+  .landing-globe {
     order: 2;
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 560px) {
+  .landing-globe {
+    min-height: 200px;
   }
 }
 

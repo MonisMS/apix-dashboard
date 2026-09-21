@@ -6,6 +6,7 @@ import { IconCircleCheck } from '../compat/icons';
 import { useValidation } from '../api';
 import { idx, pct } from '../format';
 import { pageHeader, queryState } from '../state';
+import { InfoDot } from '../components/InfoDot';
 
 export default function Validation() {
   const q = useValidation();
@@ -23,14 +24,19 @@ export default function Validation() {
         [{ label: d.overlap.has_overlap ? 'overlapping' : 'no overlap', color: d.overlap.has_overlap ? 'teal' : 'orange' }])}
 
       <Paper>
-        <Title order={2} mb={4}>MoSPI published Airfare index</Title>
+        <Title order={2} mb={4} className="flex items-center gap-1.5">
+          MoSPI published Airfare index
+          <InfoDot label="this chart">
+            The official Airfare series (item 294) MoSPI publishes monthly, shown on its own. APIx starts after it ends, so plotting both on one axis would imply a comparison that does not exist.
+          </InfoDot>
+        </Title>
         <Text size="xs" c="dimmed" mb="md">
           {d.mospi.source} · {d.mospi.frequency} · {d.mospi.base} · {d.mospi.n_points} points
           ({d.mospi.first} to {d.mospi.last})
         </Text>
         <LineChart
           h={280} data={mospi} dataKey="period" curveType="natural"
-          series={[{ name: 'MoSPI', color: 'grape.6' }]}
+          series={[{ name: 'MoSPI', color: 'var(--chart-2)' }]}
           xAxisProps={{ angle: -40, textAnchor: 'end', height: 70 }}
           valueFormatter={(v) => v.toFixed(2)}
         />
@@ -41,12 +47,16 @@ export default function Validation() {
       </Paper>
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
-        <Card>
-          <Title order={2} mb={4}>Pass criteria, fixed in advance</Title>
+        <Card data-tour="pass-criteria">
+          <Title order={2} mb={4} className="flex items-center gap-1.5">
+            Pass criteria, fixed in advance
+            <InfoDot label="pass criteria">
+              The four thresholds APIx must meet against MoSPI, written down before any comparison was possible. Fixing them in advance is what stops the test being tuned afterwards to whatever result appeared.
+            </InfoDot>
+          </Title>
           <Text size="xs" c="dimmed" mb="md">{h.criteria_note}</Text>
           {/* A 4-column table does not fit a phone. Scroll the table,
               not the page. */}
-          <Table.ScrollContainer minWidth={880}>
             <Table variant="vertical" withTableBorder={false}>
               <Table.Tbody>
                 <Table.Tr>
@@ -67,7 +77,6 @@ export default function Validation() {
                 </Table.Tr>
               </Table.Tbody>
             </Table>
-          </Table.ScrollContainer>
           <Text size="xs" c="dimmed" mt="md">
             Calibrated against MoSPI&rsquo;s own volatility: their airfare index moves with
             a standard deviation of {h.mospi_profile.mom_sd_pct} pp per month, so a
@@ -80,7 +89,12 @@ export default function Validation() {
           <Group gap="sm" mb="sm">
             <IconCircleCheck size={20}
               color={h.harness_works ? 'var(--mantine-color-teal-6)' : 'var(--mantine-color-red-6)'} />
-            <Title order={2}>The harness proves its own arithmetic</Title>
+            <Title order={2} className="flex items-center gap-1.5">
+              The harness proves its own arithmetic
+              <InfoDot label="the self test">
+                The comparison code is run against cases whose answers are already known — a series compared with itself must score r = 1, an unrelated one must not. If the harness cannot get those right, nothing else it reports is evidence.
+              </InfoDot>
+            </Title>
           </Group>
           <Text size="xs" c="dimmed" mb="md">
             The metrics run on cases whose answers are known, every time. A harness that
@@ -88,7 +102,6 @@ export default function Validation() {
           </Text>
           {/* A 4-column table does not fit a phone. Scroll the table,
               not the page. */}
-          <Table.ScrollContainer minWidth={880}>
             <Table striped verticalSpacing="xs">
               <Table.Thead>
                 <Table.Tr>
@@ -113,13 +126,17 @@ export default function Validation() {
                 ))}
               </Table.Tbody>
             </Table>
-          </Table.ScrollContainer>
         </Card>
       </SimpleGrid>
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
         <Card>
-          <Title order={2} mb="sm">When a real answer first exists</Title>
+          <Title order={2} mb="sm" className="flex items-center gap-1.5">
+            When a real answer first exists
+            <InfoDot label="first comparable month">
+              A month-on-month comparison needs one complete calendar month of APIx collection that MoSPI has also published. This is the earliest that can happen, and how many collection days are still needed.
+            </InfoDot>
+          </Title>
           <Table variant="vertical" withTableBorder={false}>
             <Table.Tbody>
               <Table.Tr>
@@ -148,7 +165,12 @@ export default function Validation() {
         <Card>
           <Group gap="sm" mb="sm">
             <IconCircleCheck size={20} color="var(--mantine-color-teal-6)" />
-            <Title order={2}>What we can show instead</Title>
+            <Title order={2} className="flex items-center gap-1.5">
+              What we can show instead
+              <InfoDot label="evidence available now">
+                With no overlap, correlation against MoSPI cannot be computed. These are the checks that can be run today, stated instead of a number nobody could verify.
+              </InfoDot>
+            </Title>
           </Group>
           <List size="sm" spacing="xs">
             {(d.overlap.what_we_can_show_instead ?? []).map((s) => (
@@ -158,7 +180,12 @@ export default function Validation() {
         </Card>
 
         <Card>
-          <Title order={2} mb="sm">Transitivity audit</Title>
+          <Title order={2} mb="sm" className="flex items-center gap-1.5">
+            Transitivity audit
+            <InfoDot label="transitivity">
+              Chaining day by day should land on the same level as comparing the last day directly against the base. The gap is drift; a small number is evidence the chaining is arithmetically sound.
+            </InfoDot>
+          </Title>
           <Table variant="vertical" withTableBorder={false}>
             <Table.Tbody>
               <Table.Tr>
@@ -185,7 +212,12 @@ export default function Validation() {
 
       {h.seasonal_context?.n_years > 0 && (
         <Paper>
-          <Title order={2} mb={4}>The one piece of evidence available now</Title>
+          <Title order={2} mb={4} className="flex items-center gap-1.5">
+            The one piece of evidence available now
+            <InfoDot label="seasonal context">
+              What MoSPI’s own airfare index did in this same calendar month in previous years, beside what APIx is doing now. Context, not a comparison: different years, different samples.
+            </InfoDot>
+          </Title>
           <Text size="xs" c="dimmed" mb="md">
             MoSPI&rsquo;s own history for this calendar month, against what APIx is doing
           </Text>
@@ -206,11 +238,15 @@ export default function Validation() {
       )}
 
       <Paper p={0}>
-        <Title order={2} p="lg" pb="sm">Item match rate by day</Title>
+        <Title order={2} p="lg" pb="sm" className="flex items-center gap-1.5">
+          Item match rate by day
+          <InfoDot label="match rate">
+            The share of yesterday’s priced flights found again today. The index compares a flight with itself, so an unmatched flight contributes no price change and its cell must be imputed.
+          </InfoDot>
+        </Title>
         {/* A 6-column table does not fit a phone. Scroll the table,
             not the page. */}
-        <Table.ScrollContainer minWidth={1060}>
-          <Table striped verticalSpacing="sm" horizontalSpacing="lg">
+          <Table striped verticalSpacing="sm" horizontalSpacing="sm">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Date</Table.Th>
@@ -236,7 +272,6 @@ export default function Validation() {
               ))}
             </Table.Tbody>
           </Table>
-        </Table.ScrollContainer>
       </Paper>
     </Stack>
   );

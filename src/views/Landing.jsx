@@ -4,16 +4,16 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { LayoutDashboard, Moon, Play, Sun, TrendingUp, X } from 'lucide-react';
 import {
-  Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ResponsiveContainer,
-  Tooltip as RTooltip, XAxis, YAxis,
+  Bar, BarChart, CartesianGrid, Cell, Line, LineChart, ReferenceLine,
+  ResponsiveContainer, Tooltip as RTooltip, XAxis, YAxis,
 } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { useAudit, useCollection, useIndex, useRoutes, useWeights, useWindows } from '../api';
 import { count, idx, pct, sharePct, shortDate } from '../format';
 import { SERIES_COLORS } from '../chartTokens';
 import { Globe } from '../components/Globe';
-import { NetworkMap } from '../components/NetworkMap';
-import { GuidedTour } from '../components/GuidedTour';
+import { NetworkMap, filterRoutes } from '../components/NetworkMap';
+import { useTour } from '../components/tour/TourContext';
 import AskAI from '../components/AskAI';
 import { CopilotIcon } from '../components/CopilotIcon';
 import { useDarkMode } from '../hooks/useDarkMode';
@@ -113,13 +113,18 @@ function ShortfallBar({ point, onDismiss }) {
   return (
     <div
       role="alert"
-      className="relative flex items-center gap-3 px-10 py-2 text-center text-[13.5px] font-medium text-[#17181A]"
+      className="relative flex items-center gap-3 px-9 py-1.5 text-center text-[12px] font-medium text-[#17181A] sm:px-10 sm:py-2 sm:text-[13.5px]"
       style={{ background: 'var(--warn-fill)' }}
     >
       <p className="flex-1 leading-snug">
-        Provisional figure &mdash; {count(point.n_cells_imputed)} of {count(point.n_cells)} price
-        cells imputed, {sharePct(point.weight_imputed, 1)} of basket weight. Published with its
-        shortfall rather than withheld.
+        {count(point.n_cells_imputed)} of {count(point.n_cells)} price cells had no fare to
+        compare today, so they follow the movement of the routes around them. That covers{' '}
+        {sharePct(point.weight_imputed, 1)} of the basket.
+        {/* The justification is worth saying, but not worth five lines on a
+            phone before anything else is visible. */}
+        <span className="hidden sm:inline">
+          {' '}We publish the number with the gap stated rather than hold it back.
+        </span>
       </p>
       <button
         type="button"
@@ -144,9 +149,10 @@ function HeroStat({ value, label }) {
 }
 
 export default function Landing() {
-  const [tourRunning, setTourRunning] = useState(false);
   const [noticeDismissed, setNoticeDismissed] = useState(false);
   const [seriesMode, setSeriesMode] = useState('headline');
+  const [mapFilter, setMapFilter] = useState('all');
+  const { start: startTour } = useTour();
   const index = useIndex();
   const routes = useRoutes();
   const collection = useCollection();
@@ -166,8 +172,14 @@ export default function Landing() {
   const routeCount = routes.data?.n_routes ?? null;
   const observations = collection.data?.summary?.observations ?? null;
 
-  const rankedRoutes = [...(routes.data?.routes ?? [])].sort((a, b) => (b.weight ?? 0) - (a.weight ?? 0)).slice(0, 10);
-  const basketPax = (routes.data?.routes ?? []).reduce((sum, r) => sum + (r.pax_cy ?? 0), 0) || null;
+  // The aside beside the map showed a fixed top ten whatever the map was
+  // filtered to, so "All 12 corridors" listed 10 and "Top 5 by weight" still
+  // listed 10. It now runs the map's own filter over the same routes.
+  const mapRoutes = filterRoutes(
+    [...(routes.data?.routes ?? [])].sort((a, b) => (b.weight ?? 0) - (a.weight ?? 0)),
+    mapFilter,
+  );
+  const mapPax = mapRoutes.reduce((sum, r) => sum + (r.pax_cy ?? 0), 0) || null;
 
   const showShortfall = !noticeDismissed && last?.n_cells_imputed > 0;
   const indexLabel = last ? `Index, ${shortDate(last.period_end)}` : 'Index';
@@ -256,13 +268,12 @@ export default function Landing() {
 
   return (
     <div className="landing-theme min-h-screen bg-background text-foreground" style={{ '--page-bg': 'var(--background)' }}>
-      <GuidedTour run={tourRunning} onFinish={() => setTourRunning(false)} page="landing" />
 
       <div className="sticky top-0 z-40">
         {showShortfall && <ShortfallBar point={last} onDismiss={() => setNoticeDismissed(true)} />}
 
         <header className="border-b border-border bg-background">
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-3 px-5 py-2.5 md:px-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 px-5 py-2.5 md:px-6 lg:justify-start">
             <Link href="/" className="flex shrink-0 items-center gap-2.5">
               <LogoMark />
               <span className="leading-tight">
@@ -273,7 +284,7 @@ export default function Landing() {
               </span>
             </Link>
 
-            <nav aria-label="Primary" className="hidden lg:flex">
+            <nav aria-label="Primary" className="flex">
               <Link
                 href="/overview"
                 data-tour="nav-dashboard"
@@ -283,7 +294,7 @@ export default function Landing() {
               </Link>
             </nav>
 
-            <div className="ml-auto flex shrink-0 items-center gap-5">
+            <div className="flex shrink-0 items-center gap-3 sm:gap-5 lg:ml-auto">
               <AskAI
                 trigger={
                   <Button
@@ -298,7 +309,7 @@ export default function Landing() {
               <Button
                 size="sm"
                 className="h-10 rounded-[7px] px-4 text-[14.5px] font-medium"
-                onClick={() => setTourRunning(true)}
+                onClick={startTour}
                 data-tour="guide-me"
               >
                 <Play className="h-3.5 w-3.5" aria-hidden="true" /> Guide me
@@ -355,7 +366,7 @@ export default function Landing() {
             <div className="mt-[28px] flex flex-wrap gap-2.5">
               <Button
                 className="h-11 rounded-[7px] px-5 text-[14.5px] font-medium"
-                onClick={() => setTourRunning(true)}
+                onClick={startTour}
                 data-tour="cta-tour"
               >
                 <Play className="h-[15px] w-[15px]" aria-hidden="true" /> Walk me through it
@@ -372,7 +383,7 @@ export default function Landing() {
             </div>
           </div>
 
-          <Globe className="landing-globe" data-tour="route-map" />
+          <Globe className="landing-globe" />
       </section>
       <div className="landing-hero-fade" aria-hidden="true" />
 
@@ -382,12 +393,12 @@ export default function Landing() {
             <b>What this page shows.</b> One number for what it costs to fly in India right now,
             against the average of the reference window it is based on. It is built from{' '}
             {count(observations)} fares collected automatically across {count(routeCount)} routes,
-            once a day, at five advance-purchase windows &mdash; with no one typing anything in.
+            once a day, at five advance-purchase windows, with no one typing anything in.
           </div>
         </div>
 
         <div className="lc-grid">
-          <section className="lc-panel" data-tour="kpi-row">
+          <section className="lc-panel">
             <div className="lc-panel-l">
               <div className="lc-lbl">National airfare price index</div>
               <div className="lc-fig">{idx(last?.level)}</div>
@@ -434,7 +445,7 @@ export default function Landing() {
                   </div>
                   <p className="lc-sub">
                     The dark line is the headline index. Switching to booking windows splits it into the
-                    five advance-purchase leads it is built from &mdash; T+1 through T+45 &mdash; which is
+                    five advance-purchase leads it is built from (T+1 through T+45), which is
                     where most of the day-to-day movement actually lives.
                   </p>
                 </div>
@@ -491,7 +502,7 @@ export default function Landing() {
             </div>
           </section>
 
-          <div className="lc-stats" data-tour="snapshot">
+          <div className="lc-stats">
             <div className="lc-stat">
               <span className="k">Routes weighted</span>
               <span className="v">{count(routeCount)}</span>
@@ -523,17 +534,26 @@ export default function Landing() {
             <div className="lc-finding">Where the basket reaches</div>
             <p className="lc-sub" style={{ marginBottom: 14 }}>
               Click a hub or a corridor chip to inspect it. The moving beacon is a visualization of
-              the selected corridor, not live flight tracking &mdash; the index, cells priced, and
-              basket weight shown for it are real, pulled from the same data as the table above.
+              the selected corridor, not live flight tracking. The index, cells priced and basket
+              weight shown for it are real, pulled from the same data as the table above.
             </p>
             <div className="netmap-layout">
-              <NetworkMap routes={routes.data?.routes ?? []} />
+              <NetworkMap
+                routes={routes.data?.routes ?? []}
+                filterMode={mapFilter}
+                onFilterMode={setMapFilter}
+              />
               <aside className="netmap-notes">
                 <div className="netmap-note-figure">
-                  <strong>{count(basketPax)}</strong>
+                  {/* 3,74,75,530 in Indian digit grouping is hard to take in
+                      at a glance; crore is how this size of number is read
+                      here. The exact figure stays on hover. */}
+                  <strong title={`${count(mapPax)} passenger journeys`}>
+                    {mapPax ? `${(mapPax / 1e7).toFixed(2)} crore` : '—'}
+                  </strong>
                   <p>
-                    DGCA passenger journeys (CY2025) represented across {count(routes.data?.n_routes)}{' '}
-                    monitored city-pairs.
+                    DGCA passenger journeys (CY2025) on the {mapRoutes.length}{' '}
+                    {mapRoutes.length === 1 ? 'corridor' : 'corridors'} shown on the map.
                   </p>
                 </div>
                 <div>
@@ -541,7 +561,7 @@ export default function Landing() {
                     <span className="eyebrow">Highest-weighted corridors</span>
                     <span className="tag">Basket share</span>
                   </div>
-                  {rankedRoutes.map((r, i) => (
+                  {mapRoutes.map((r, i) => (
                     <div className="netmap-hub-row" key={r.pair}>
                       <span>{String(i + 1).padStart(2, '0')}</span>
                       <div>
@@ -551,7 +571,7 @@ export default function Landing() {
                       <span className="netmap-hub-share">{sharePct(r.weight, 1)}</span>
                     </div>
                   ))}
-                  {rankedRoutes.length === 0 && (
+                  {mapRoutes.length === 0 && (
                     <p className="text-xs text-muted-foreground">Route weights are unavailable right now.</p>
                   )}
                 </div>
@@ -560,12 +580,12 @@ export default function Landing() {
           </section>
 
           <div className="lc-g2">
-            <section className="lc-card" data-tour="provenance">
+            <section className="lc-card">
               <div className="lc-finding">Which routes moved the index today</div>
               <p className="lc-sub">
                 Busy routes move the national number more than quiet ones, because each route is
-                weighted by expenditure &mdash; passengers times mean fare &mdash; not by how many
-                flights it has.
+                weighted by expenditure (passengers times mean fare), not by how many flights it
+                has.
               </p>
               <div className="lc-legend">
                 <span className="lc-lg"><i style={{ background: UP_COLOR }} />Pushed the index up</span>
@@ -575,17 +595,38 @@ export default function Landing() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={contributions} layout="vertical" margin={{ top: 4, right: 14, left: 6, bottom: 0 }}>
                     <CartesianGrid stroke="var(--border)" horizontal={false} />
+                    <ReferenceLine x={0} stroke="var(--muted-foreground)" />
                     <XAxis type="number" tick={AXIS_TICK} tickLine={false} axisLine={false} unit="pp" />
                     <YAxis type="category" dataKey="pair" tick={AXIS_TICK} tickLine={false} axisLine={false} width={72} />
                     <RTooltip
-                      cursor={{ fill: 'var(--accent)' }}
-                      formatter={(v) => [`${v.toFixed(3)} pp`, 'contribution']}
-                      contentStyle={{
-                        background: 'var(--popover)', border: '1px solid var(--border)',
-                        borderRadius: 8, fontSize: 12.5,
+                      cursor={{ fill: 'var(--muted)', fillOpacity: 0.55 }}
+                      wrapperStyle={{ outline: 'none' }}
+                      content={({ active, payload, label }) => {
+                        if (!active || !payload?.length) return null;
+                        const v = payload[0].value;
+                        return (
+                          <div
+                            style={{
+                              background: 'var(--popover)',
+                              color: 'var(--popover-foreground)',
+                              border: '1px solid var(--border)',
+                              padding: '8px 10px',
+                              fontSize: 12,
+                              boxShadow: '0 2px 8px rgb(0 0 0 / 0.12)',
+                            }}
+                          >
+                            <div style={{ fontWeight: 600, marginBottom: 2 }}>{label}</div>
+                            <div style={{ fontVariantNumeric: 'tabular-nums' }}>
+                              {v >= 0 ? '+' : ''}{v.toFixed(3)} pp of the headline move
+                            </div>
+                            <div style={{ color: 'var(--muted-foreground)', marginTop: 2 }}>
+                              {v >= 0 ? 'pushed the index up' : 'pulled the index down'}
+                            </div>
+                          </div>
+                        );
                       }}
                     />
-                    <Bar dataKey="contribution" isAnimationActive={false}>
+                    <Bar dataKey="contribution" isAnimationActive={false} radius={[0, 3, 3, 0]} maxBarSize={18}>
                       {contributions.map((c) => (
                         <Cell key={c.pair} fill={c.contribution >= 0 ? UP_COLOR : DOWN_COLOR} />
                       ))}
@@ -611,7 +652,7 @@ export default function Landing() {
               <div className="lc-note">
                 <b>Nothing is published without its shortfall.</b> Every response carries how many
                 routes reported, how much was imputed, and whether the reference window is still
-                provisional &mdash; so a number can be checked before it is quoted.
+                provisional, so a number can be checked before it is quoted.
               </div>
             </section>
           </div>

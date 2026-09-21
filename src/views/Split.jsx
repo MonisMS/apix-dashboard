@@ -8,6 +8,8 @@ import { IconCheck, IconInfoCircle, IconReceiptTax, IconX } from '../compat/icon
 import { useSplit } from '../api';
 import { count, shortDate } from '../format';
 import { pageHeader, queryState } from '../state';
+import { InfoDot } from '../components/InfoDot';
+import { ColorKey } from '../components/ColorKey';
 import { Note } from '../ui';
 
 /**
@@ -62,19 +64,19 @@ export default function Split() {
         ],
       )}
 
-      <Note title="This is a periodic study, not the daily feed">
+      <Note title={<span className="inline-flex items-center gap-1.5">This is a periodic study, not the daily feed<InfoDot label="why this is a periodic study">The split source allows far fewer requests than a daily sweep of every route and booking window needs, so it is run as an occasional panel. The daily index is never back-filled from it.</InfoDot></span>}>
         <Text size="sm">{d.why_not_daily}</Text>
         <Text size="sm" mt="xs">{d.why_not_backfilled}</Text>
       </Note>
 
       <div className="lc-stats">
         <div className="lc-stat">
-          <span className="k">Overall tax share</span>
+          <span className="k">Overall tax share <InfoDot label="overall tax share">The carrier&rsquo;s taxes-and-fees line as a share of the all-in fare, across every observation in the panel. It is the airline&rsquo;s own accounting split, not a statutory rate.</InfoDot></span>
           <span className="v">{d.tax_share_pct_overall}%</span>
           <span className="n">of the all-in fare, across {count(d.observations)} observations</span>
         </div>
         <div className="lc-stat">
-          <span className="k">Study coverage</span>
+          <span className="k">Study coverage <InfoDot label="study coverage">The share of all stored observations that carry a base/tax split. The rest keep NULL rather than a modelled figure — an invented split would be indistinguishable from an observed one once it is in the database.</InfoDot></span>
           <span className="v">{d.share_of_all_observations_pct}%</span>
           <span className="n">
             of all stored observations carry a split. The other {(100 - d.share_of_all_observations_pct).toFixed(1)}%
@@ -82,7 +84,7 @@ export default function Split() {
           </span>
         </div>
         <div className="lc-stat">
-          <span className="k">Panel</span>
+          <span className="k">Panel <InfoDot label="the panel">Which booking windows, which days and which source this one-off study covers. Everything on this page comes from that panel alone.</InfoDot></span>
           <span className="v">T+{(d.booking_window_days ?? []).join(', T+')}</span>
           <span className="n">
             {(d.study_days ?? []).map(shortDate).join(', ')} · source <b>{d.source}</b>
@@ -91,7 +93,14 @@ export default function Split() {
       </div>
 
       <Paper>
-        <Title order={2} mb={4}>Tax share by carrier</Title>
+        <Title order={2} mb={4} className="flex items-center gap-1.5">
+          Tax share by carrier
+          <InfoDot label="tax share">
+            The carrier&rsquo;s own taxes-and-fees line as a share of the all-in fare. It is
+            accounting practice, not a statutory rate, which is why airlines on the same route
+            on the same day report such different figures.
+          </InfoDot>
+        </Title>
         <Text size="xs" c="dimmed" mb="md">
           Akasa reports about 4% where IndiGo and Air India report about 24%, on the
           same routes on the same day. That is not an error and it is not a different
@@ -101,13 +110,17 @@ export default function Split() {
         </Text>
         <BarChart
           h={260} data={carrierChart} dataKey="carrier"
-          series={[{ name: 'Tax share', color: 'indigo.6' }]}
+          series={[{ name: 'Tax share', color: 'var(--chart-2)' }]}
           withTooltip valueFormatter={(v) => `${v.toFixed(2)}%`}
           yAxisProps={{ width: 56 }}
         />
+        <ColorKey
+          className="mt-3"
+          items={[{ color: 'var(--chart-2)', label: 'Mean tax share of the all-in fare' }]}
+          note="The range each carrier spans is in the table below."
+        />
         {/* A 5-column table does not fit a phone. Scroll the table,
             not the page. */}
-        <Table.ScrollContainer minWidth={970}>
           <Table mt="md" striped verticalSpacing="sm">
             <Table.Thead>
               <Table.Tr>
@@ -135,18 +148,23 @@ export default function Split() {
               ))}
             </Table.Tbody>
           </Table>
-        </Table.ScrollContainer>
       </Paper>
 
       <Paper p={0}>
         <Group gap="sm" p="lg" pb="sm">
           <IconReceiptTax size={20} aria-hidden="true" />
-          <Title order={2}>What we can and cannot observe</Title>
+          <Title order={2} className="flex items-center gap-1.5">
+            What we can and cannot observe
+            <InfoDot label="the four money fields">
+              The problem statement names four money fields. The ones the source does not
+              publish are stored as NULL rather than estimated — a modelled figure and an
+              observed one look identical once they are in a database.
+            </InfoDot>
+          </Title>
         </Group>
         {/* A 4-column table does not fit a phone. Scroll the table,
             not the page. */}
-        <Table.ScrollContainer minWidth={880}>
-          <Table striped verticalSpacing="sm" horizontalSpacing="lg" layout="fixed">
+          <Table striped verticalSpacing="sm" horizontalSpacing="sm" layout="fixed">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th w={240}>Field</Table.Th>
@@ -173,16 +191,21 @@ export default function Split() {
               })}
             </Table.Tbody>
           </Table>
-        </Table.ScrollContainer>
       </Paper>
 
       <Paper p={0}>
-          <Title order={2} p="lg" pb="sm">Tax share by route</Title>
+          <Title order={2} p="lg" pb="sm" className="flex items-center gap-1.5">
+            Tax share by route
+            <InfoDot label="this table">
+              Route-level variation is mostly carrier mix: a route Akasa flies pulls the average
+              down, not because the route is taxed differently.
+            </InfoDot>
+          </Title>
           <Text size="xs" c="dimmed" px="lg" pb="sm">
             Route-level variation is mostly carrier mix: a route Akasa flies pulls the
             average down, not because the route is taxed differently.
           </Text>
-          <Table striped verticalSpacing="sm" horizontalSpacing="lg">
+          <Table striped verticalSpacing="sm" horizontalSpacing="sm">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Route</Table.Th>

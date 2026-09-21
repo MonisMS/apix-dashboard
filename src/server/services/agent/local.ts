@@ -1,6 +1,7 @@
 import type { Vintage } from '../../envelope';
 import { headline } from '../index';
 import { routeList } from '../drilldown';
+import { coverage } from '../collection';
 import { BUDGET, LOCAL_TOPICS } from './constants';
 
 /**
@@ -56,6 +57,90 @@ async function directAnswer(
         `roughly ${rupees(r.mean_fare_latest as number)}${tail}.`,
       [{ tool: 'list_routes', arguments: {} }],
     ];
+  }
+
+  // "Why did fares move this week?" -- the dashboard's first suggested
+  // question, which previously had no local answer at all and fell through
+  // to the generic "I don't have a prepared answer" reply.
+  //
+  // Note what this deliberately does NOT do: compute a percentage change
+  // between two index levels. Arithmetic on levels belongs in
+  // backend/apix/index/, so this quotes the published endpoints of the
+  // window and the backend's own per-route pct_change_1p instead.
+  if (
+    has('why did', 'why have', 'what drove', 'fares move', 'fares moved', 'prices move') ||
+    (has('this week') && has('move', 'change', 'happen'))
+  ) {
+    const h = await headline(v);
+    const pts = h.points;
+    if (pts.length < 2) {
+      return [
+        `Only ${pts.length} daily point has been published so far, so there is no ` +
+          'movement to explain yet. The index needs at least two collection days.',
+        [{ tool: 'get_headline_index', arguments: {} }],
+      ];
+    }
+    const first = pts[0];
+    const last = pts[pts.length - 1];
+    const routes = (await routeList(v)).routes.filter((r) => r.pct_change_1p != null);
+    const ranked = [...routes].sort(
+      (a, b) => (b.pct_change_1p as number) - (a.pct_change_1p as number),
+    );
+    const up = ranked.filter((r) => (r.pct_change_1p as number) > 0).slice(0, 3);
+    const down = ranked.filter((r) => (r.pct_change_1p as number) < 0).slice(-3).reverse();
+
+    const lines = [
+      `The headline **APIx.ALL** index is at **${last.level}** (${last.period_end}), ` +
+        `against **${first.level}** on ${first.period_end}, the first day of the window.`,
+      '',
+      'On the latest day, the routes that moved most were:',
+    ];
+    for (const r of up) lines.push(`- **${r.pair}** ${signed(r.pct_change_1p as number)}`);
+    for (const r of down) lines.push(`- **${r.pair}** ${signed(r.pct_change_1p as number)}`);
+    if (!up.length && !down.length) lines.push('- no route recorded a day-on-day move');
+    lines.push('');
+    lines.push(
+      'These are offered fares, not transacted fares, and the window is still ' +
+        'provisional.',
+    );
+    return [
+      lines.join('\n'),
+      [
+        { tool: 'get_headline_index', arguments: {} },
+        { tool: 'list_routes', arguments: {} },
+      ],
+    ];
+  }
+
+  // "Where does the data come from?" -- likewise a suggested question with
+  // no local answer. Answered from the live collection record rather than a
+  // canned description, so it cannot drift from what was actually collected.
+  if (
+    has('where does the data', 'where do the fares', 'data come from', 'data source') ||
+    (has('source', 'sources') && has('data', 'fare', 'collect'))
+  ) {
+    const c = await coverage(v);
+    const sum = c.summary;
+    const lines = [
+      `Fares are collected by our own sweeps and stored in Postgres: ` +
+        `**${sum.observations?.toLocaleString('en-IN')} observations** over ` +
+        `**${sum.days} collection days**, from ${sum.collection_runs} runs.`,
+      '',
+      `- Live sources: ${sum.sources.length ? sum.sources.join(', ') : 'none recorded'}`,
+    ];
+    if (c.backfill?.rows) {
+      lines.push(
+        `- Backfill: ${c.backfill.rows.toLocaleString('en-IN')} pre-window rows` +
+          (c.backfill.sources?.length ? ` from ${c.backfill.sources.join(', ')}` : '') +
+          ' -- imported history, not our own sweep, and flagged as such',
+      );
+    }
+    lines.push('');
+    lines.push(
+      'Every published point carries a `repro_hash` over the exact links and ' +
+        'weights behind it. These are offered fares, not transacted fares.',
+    );
+    return [lines.join('\n'), [{ tool: 'get_collection_status', arguments: {} }]];
   }
 
   if (has('no data', 'not collected', 'missing route', 'no fares', 'which routes', 'what routes')) {
