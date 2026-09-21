@@ -2,8 +2,8 @@
 
 import {
   Calculator, ChartArea, ChartBar, Clock, CloudDownload, EyeOff, Filter,
-  Grid3x3, Moon, PlaneTakeoff, Receipt, ReceiptText, Route, Scale, Server,
-  Sun, Target,
+  Grid3x3, Moon, PlaneTakeoff, Play, Receipt, ReceiptText, Route, Scale,
+  Server, Sun, Target,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -15,6 +15,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/sonner';
 import AskAI from '../components/AskAI';
+import { useTour } from '../components/tour/TourContext';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { useCollection, useIndex } from '../api';
 import { count, idx, sharePct, shortDate } from '../format';
@@ -132,6 +133,7 @@ function AsideSummary() {
 }
 
 export default function AppLayout({ children }) {
+  const { start: startTour } = useTour();
   const pathname = usePathname();
   const { data: index } = useIndex();
 
@@ -187,6 +189,16 @@ export default function AppLayout({ children }) {
                 {index.reference.label}
               </p>
             )}
+            {/* Restartable from any console page: a judge can interrupt on
+                /cleaning and still be walked through from the beginning. */}
+            <button
+              type="button"
+              onClick={startTour}
+              className="hidden h-8 shrink-0 items-center gap-1.5 rounded-none border border-border px-2.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground sm:inline-flex"
+            >
+              <Play className="h-3.5 w-3.5" aria-hidden="true" />
+              Tour
+            </button>
             <ThemeToggle />
           </div>
         </header>

@@ -241,7 +241,8 @@
  * reserved for data and the chrome monochrome. --primary is the ink itself,
  * so interaction has no accent hue of its own.
  */
-.landing-theme {
+.landing-theme,
+body:has(.landing-theme) #react-joyride-portal {
   --background: #f7f5f0;
   --foreground: #191917;
 
@@ -289,7 +290,8 @@
  * explicit toggle to light is not overridden by the OS here.
  */
 .dark .landing-theme,
-.landing-theme.dark {
+.landing-theme.dark,
+.dark body:has(.landing-theme) #react-joyride-portal {
   --background: #151815;
   --foreground: #f3f1e9;
 

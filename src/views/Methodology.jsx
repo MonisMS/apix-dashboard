@@ -24,7 +24,7 @@ export default function Methodology() {
     <Stack gap="lg">
       {pageHeader('Methodology', 'Two formulas, two levels — and why they are not in conflict')}
 
-      <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
+      <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg" data-tour="formulas">
         <Card>
           <Badge variant="light" color="indigo" mb="sm">Elementary level</Badge>
           <Title order={2} mb="xs" className="flex items-center gap-1.5">

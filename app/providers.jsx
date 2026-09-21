@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from 'next-themes';
 
+import { TourProvider, useTour } from '@/components/tour/TourContext';
+import { GuidedTour } from '@/components/tour/GuidedTour';
+
 // next-themes replaces the hand-rolled useDarkMode state. It writes the same
 // 'apix-theme' key with the same 'dark'/'light' values, so existing visitors
 // keep their preference, and it injects a blocking script that sets the class
@@ -36,7 +39,23 @@ export default function Providers({ children }) {
       storageKey="apix-theme"
       disableTransitionOnChange
     >
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        {/* The tour lives here, above the router's page subtree, so a single
+            Joyride instance survives every client navigation and keeps its own
+            step position across router.push. Mounting it inside AppLayout
+            could not work: that unmounts when you leave the console, and does
+            not exist on the landing page at all. */}
+        <TourProvider>
+          {children}
+          <TourMount />
+        </TourProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   );
+}
+
+/** Bridges the tour context into the single Joyride instance. */
+function TourMount() {
+  const { running, runId, stop } = useTour();
+  return <GuidedTour running={running} runId={runId} onStop={stop} />;
 }

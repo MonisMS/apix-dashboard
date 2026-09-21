@@ -13,7 +13,7 @@ import { count, idx, pct, sharePct, shortDate } from '../format';
 import { SERIES_COLORS } from '../chartTokens';
 import { Globe } from '../components/Globe';
 import { NetworkMap, filterRoutes } from '../components/NetworkMap';
-import { GuidedTour } from '../components/GuidedTour';
+import { useTour } from '../components/tour/TourContext';
 import AskAI from '../components/AskAI';
 import { CopilotIcon } from '../components/CopilotIcon';
 import { useDarkMode } from '../hooks/useDarkMode';
@@ -145,10 +145,10 @@ function HeroStat({ value, label }) {
 }
 
 export default function Landing() {
-  const [tourRunning, setTourRunning] = useState(false);
   const [noticeDismissed, setNoticeDismissed] = useState(false);
   const [seriesMode, setSeriesMode] = useState('headline');
   const [mapFilter, setMapFilter] = useState('all');
+  const { start: startTour } = useTour();
   const index = useIndex();
   const routes = useRoutes();
   const collection = useCollection();
@@ -264,7 +264,6 @@ export default function Landing() {
 
   return (
     <div className="landing-theme min-h-screen bg-background text-foreground" style={{ '--page-bg': 'var(--background)' }}>
-      <GuidedTour run={tourRunning} onFinish={() => setTourRunning(false)} page="landing" />
 
       <div className="sticky top-0 z-40">
         {showShortfall && <ShortfallBar point={last} onDismiss={() => setNoticeDismissed(true)} />}
@@ -306,7 +305,7 @@ export default function Landing() {
               <Button
                 size="sm"
                 className="h-10 rounded-[7px] px-4 text-[14.5px] font-medium"
-                onClick={() => setTourRunning(true)}
+                onClick={startTour}
                 data-tour="guide-me"
               >
                 <Play className="h-3.5 w-3.5" aria-hidden="true" /> Guide me
@@ -363,7 +362,7 @@ export default function Landing() {
             <div className="mt-[28px] flex flex-wrap gap-2.5">
               <Button
                 className="h-11 rounded-[7px] px-5 text-[14.5px] font-medium"
-                onClick={() => setTourRunning(true)}
+                onClick={startTour}
                 data-tour="cta-tour"
               >
                 <Play className="h-[15px] w-[15px]" aria-hidden="true" /> Walk me through it
@@ -380,7 +379,7 @@ export default function Landing() {
             </div>
           </div>
 
-          <Globe className="landing-globe" data-tour="route-map" />
+          <Globe className="landing-globe" />
       </section>
       <div className="landing-hero-fade" aria-hidden="true" />
 
@@ -395,7 +394,7 @@ export default function Landing() {
         </div>
 
         <div className="lc-grid">
-          <section className="lc-panel" data-tour="kpi-row">
+          <section className="lc-panel">
             <div className="lc-panel-l">
               <div className="lc-lbl">National airfare price index</div>
               <div className="lc-fig">{idx(last?.level)}</div>
@@ -499,7 +498,7 @@ export default function Landing() {
             </div>
           </section>
 
-          <div className="lc-stats" data-tour="snapshot">
+          <div className="lc-stats">
             <div className="lc-stat">
               <span className="k">Routes weighted</span>
               <span className="v">{count(routeCount)}</span>
@@ -577,7 +576,7 @@ export default function Landing() {
           </section>
 
           <div className="lc-g2">
-            <section className="lc-card" data-tour="provenance">
+            <section className="lc-card">
               <div className="lc-finding">Which routes moved the index today</div>
               <p className="lc-sub">
                 Busy routes move the national number more than quiet ones, because each route is

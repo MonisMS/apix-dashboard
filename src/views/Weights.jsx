@@ -34,7 +34,7 @@ export default function Weights() {
       </Note>
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
-        <Paper>
+        <Paper data-tour="route-weights">
           <Title order={2} mb="md" className="flex items-center gap-1.5">
             Weight by route
             <InfoDot label="this bar">

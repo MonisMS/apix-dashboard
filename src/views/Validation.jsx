@@ -47,7 +47,7 @@ export default function Validation() {
       </Paper>
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
-        <Card>
+        <Card data-tour="pass-criteria">
           <Title order={2} mb={4} className="flex items-center gap-1.5">
             Pass criteria, fixed in advance
             <InfoDot label="pass criteria">

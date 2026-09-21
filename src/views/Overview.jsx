@@ -13,8 +13,8 @@ import { useAudit, useCollection, useIndex, useRoutes } from '../api';
 import { count, idx, sharePct, shortDate } from '../format';
 import { Delta, Note, PageHeader, queryState } from '../ui';
 import { CHART } from '../chartTokens';
-import { GuidedTour } from '../components/GuidedTour';
 import { InfoDot } from '../components/InfoDot';
+import { useTour } from '../components/tour/TourContext';
 import { ColorKey } from '../components/ColorKey';
 
 const STATIC = process.env.NEXT_PUBLIC_API_STATIC === '1';
@@ -126,7 +126,7 @@ function QualityRow({ label, info, n, of, share, color, footnote }) {
 
 export default function Overview() {
   const [range, setRange] = useState('all');
-  const [tourRunning, setTourRunning] = useState(false);
+  const { start: startTour } = useTour();
   const index = useIndex();
   const routes = useRoutes();
   const audit = useAudit();
@@ -176,7 +176,6 @@ export default function Overview() {
 
   return (
     <div className="flex flex-col gap-5">
-      <GuidedTour run={tourRunning} onFinish={() => setTourRunning(false)} page="overview" />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <PageHeader
@@ -189,7 +188,7 @@ export default function Overview() {
         />
         <div className="flex items-center gap-2">
           {STATIC && <Badge variant="outline">Static demo snapshot</Badge>}
-          <Button variant="outline" size="sm" onClick={() => setTourRunning(true)}>
+          <Button variant="outline" size="sm" onClick={startTour}>
             <RotateCcw className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" /> Restart tour
           </Button>
         </div>

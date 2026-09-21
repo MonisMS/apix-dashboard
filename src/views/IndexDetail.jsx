@@ -92,7 +92,7 @@ export default function IndexDetail() {
         [{ label: `${points.length} points`, color: 'gray' }])}
 
       <Tabs defaultValue="D">
-        <Tabs.List mb="lg">
+        <Tabs.List mb="lg" data-tour="frequency-tabs">
           <Tabs.Tab value="D">Daily</Tabs.Tab>
           <Tabs.Tab value="W">Weekly</Tabs.Tab>
           <Tabs.Tab value="M">Monthly</Tabs.Tab>

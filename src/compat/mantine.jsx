@@ -337,7 +337,15 @@ export function SegmentedControl({ value, onChange, data = [], size, className, 
 
 /* ---- Table ---- */
 
-export function Table({ children, striped, layout, className, style, ...rest }) {
+export function Table({
+  children, striped, layout, className, style,
+  // Consumed, not forwarded: these are Mantine spacing props with no effect
+  // here (Th/Td carry their own padding), and spreading them onto <table>
+  // made React warn "does not recognize the verticalSpacing prop" on every
+  // page that renders a table.
+  verticalSpacing, horizontalSpacing, variant, withTableBorder,
+  ...rest
+}) {
   const { style: s, rest: r } = splitProps(rest);
   return (
     <table
@@ -408,9 +416,16 @@ export function Tabs({ defaultValue, children }) {
   const [value, setValue] = React.useState(defaultValue);
   return <TabsCtx.Provider value={{ value, setValue }}>{children}</TabsCtx.Provider>;
 }
-Tabs.List = function TabsList({ children, mb, className }) {
+Tabs.List = function TabsList({ children, mb, className, ...rest }) {
+  // Forwards the remaining props like every other wrapper here. It used to
+  // drop them, so a data-* attribute put on a Tabs.List never reached the DOM.
+  const { style: s, rest: r } = splitProps(rest);
   return (
-    <div className={cn('flex gap-1 border-b border-border', className)} style={boxStyle({ mb })}>
+    <div
+      className={cn('flex gap-1 border-b border-border', className)}
+      style={{ ...boxStyle({ mb }), ...s }}
+      {...r}
+    >
       {children}
     </div>
   );

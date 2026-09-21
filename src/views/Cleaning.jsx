@@ -37,7 +37,7 @@ export default function Cleaning() {
         { label: `${d.n_flags} flagged`, color: d.n_flags ? 'orange' : 'gray' },
       ])}
 
-      <Paper>
+      <Paper data-tour="screening">
         <Title order={2} mb={4} className="flex items-center gap-1.5">
           What each screening rule does to the published number
           <InfoDot label="this comparison">

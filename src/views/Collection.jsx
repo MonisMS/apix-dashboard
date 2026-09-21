@@ -38,7 +38,7 @@ export default function Collection() {
         </Alert>
       )}
 
-      <div className="lc-stats">
+      <div className="lc-stats" data-tour="collection-stats">
         {[
           ['Observations', count(s.observations),
            'Every individual fare we stored, across every route, day and booking window.'],
@@ -95,11 +95,10 @@ export default function Collection() {
                   </InfoDot></span>
                 </Table.Th>
                 <Table.Th ta="right">
-                  <span className="inline-flex items-center gap-1">Ran at<InfoDot label="when the sweep ran" side="left">
-                    The collector aims for a fixed daily time so that day-on-day changes are
-                    measured at the same point in the booking cycle. The difference from that
-                    time is published rather than hidden, because part of a day-on-day move can
-                    be the clock rather than the market.
+                  <span className="inline-flex items-center gap-1">Slot<InfoDot label="the collection slot" side="left">
+                    The collector aims for this time every day, so day-on-day changes are
+                    measured at the same point in the booking cycle. How far each sweep actually
+                    ran from the slot is published on /api/v1/collection.
                   </InfoDot></span>
                 </Table.Th>
               </Table.Tr>
@@ -116,10 +115,11 @@ export default function Collection() {
                     {day.failed ? <Badge size="sm" color="red" variant="light">{day.failed}</Badge> : '0'}
                   </Table.Td>
                   <Table.Td ta="right" className="whitespace-nowrap">
-                    <Text size="xs">{day.actual_ist.first}–{day.actual_ist.last} IST</Text>
-                    <Text size="xs" c={Math.abs(day.drift_minutes) <= 60 ? 'dimmed' : 'orange'}>
-                      {day.drift_minutes >= 0 ? '+' : ''}{day.drift_minutes} min vs {day.nominal_time_ist}
-                    </Text>
+                    {/* The scheduled slot only. The measured start time and the
+                        drift from it are still computed and still published on
+                        /api/v1/collection -- they are just not shown in this
+                        column, at the user's request. */}
+                    <Text size="xs">{day.nominal_time_ist} IST</Text>
                   </Table.Td>
                 </Table.Tr>
               ))}
