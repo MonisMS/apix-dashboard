@@ -9,19 +9,14 @@ const nextConfig = {
   // Turbopack infers the workspace root from it and looks outside the repo.
   turbopack: { root: dirname(fileURLToPath(import.meta.url)) },
 
-  // Stands in for the old Vite dev proxy while the API still lives in Python.
-  // A plain array lands in the `afterFiles` phase, which runs after
-  // app/api/**/route.ts — so once the real route handlers exist they win and
-  // this quietly stops applying to the paths they cover.
-  async rewrites() {
-    if (process.env.NODE_ENV !== 'development') return [];
-    return [
-      {
-        source: '/api/v1/:path*',
-        destination: 'http://127.0.0.1:8000/api/v1/:path*',
-      },
-    ];
-  },
+  // The dev proxy to the old Python API at :8000 has been removed. Its
+  // comment claimed that real route handlers in app/api/** would win over an
+  // afterFiles rewrite, and for static segments they did -- but DYNAMIC ones
+  // did not. /api/v1/carriers resolved locally while
+  // /api/v1/carriers/IndiGo and /api/v1/routes/DEL-BOM were proxied to a
+  // FastAPI service that no longer runs, so both returned 500 in development
+  // (production was unaffected, because the rewrite was dev-only). The API is
+  // app/api/v1/** now; there is nothing left to proxy to.
 };
 
 export default nextConfig;

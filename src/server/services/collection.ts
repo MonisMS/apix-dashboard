@@ -52,13 +52,21 @@ export async function coverage(v: Vintage) {
              COALESCE(a.attempts, 0) AS attempts,
              COALESCE(a.ok, 0) AS ok,
              COALESCE(a.failed, 0) AS failed,
-             to_char(o.lo AT TIME ZONE 'Asia/Kolkata', 'HH24:MI') AS ist_first,
-             to_char(o.hi AT TIME ZONE 'Asia/Kolkata', 'HH24:MI') AS ist_last,
+             -- collected_at already holds the IST wall clock the collector
+             -- ran at: for 2026-09-21 it stores 10:47, and collection_run
+             -- independently records the sweep starting at 10:47. Converting
+             -- it AT TIME ZONE 'Asia/Kolkata' therefore added the +05:30
+             -- offset a second time, reporting 16:17 and a drift of 333
+             -- minutes. The error was exactly 330 minutes on every one of the
+             -- twelve days, which is what gave it away. Read the stored wall
+             -- clock instead.
+             to_char(o.lo AT TIME ZONE 'UTC', 'HH24:MI') AS ist_first,
+             to_char(o.hi AT TIME ZONE 'UTC', 'HH24:MI') AS ist_last,
              to_char(o.lo AT TIME ZONE 'UTC', 'HH24:MI') AS utc_first,
              to_char(o.hi AT TIME ZONE 'UTC', 'HH24:MI') AS utc_last,
              round(EXTRACT(EPOCH FROM (
-                 (o.lo AT TIME ZONE 'Asia/Kolkata')
-               - (date_trunc('day', o.lo AT TIME ZONE 'Asia/Kolkata')
+                 (o.lo AT TIME ZONE 'UTC')
+               - (date_trunc('day', o.lo AT TIME ZONE 'UTC')
                   + interval '10 hours 45 minutes')
              )) / 60)::int AS drift_minutes
         FROM obs o LEFT JOIN att a ON a.start_date = o.obs_date

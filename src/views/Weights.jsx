@@ -1,12 +1,12 @@
 'use client';
 
 import { Card, Group, Paper, SimpleGrid, Stack, Table, Text, Title } from '../compat/mantine';
-import { DonutChart } from '../compat/mantine-charts';
 import { IconScale } from '../compat/icons';
 import { useWeights } from '../api';
 import { count, rupees, sharePct } from '../format';
 import { pageHeader, queryState } from '../state';
-import { SERIES_COLORS } from '../chartTokens';
+import { InfoDot } from '../components/InfoDot';
+import { ColorKey } from '../components/ColorKey';
 import { Note } from '../ui';
 
 export default function Weights() {
@@ -17,10 +17,9 @@ export default function Weights() {
   const d = q.data;
   const routes = d.provenance.route.routes ?? {};
   const entries = Object.entries(routes);
-  const donut = entries.slice(0, 9).map(([pair, v], i) => ({
-    name: pair, value: Number((v.weight * 100).toFixed(2)),
-    color: SERIES_COLORS[i % SERIES_COLORS.length],
-  }));
+  const ordered = [...entries].sort((a, b) => b[1].weight - a[1].weight);
+  const shade = (i) =>
+    `color-mix(in oklab, var(--chart-2) ${Math.round(92 - (i / Math.max(ordered.length - 1, 1)) * 62)}%, var(--card))`;
   const cpi = d.cpi_context;
 
   return (
@@ -36,22 +35,58 @@ export default function Weights() {
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
         <Paper>
-          <Title order={2} mb="md">Weight by route</Title>
-          <Group justify="center">
-            <DonutChart size={210} thickness={28} data={donut} withTooltip
-                        tooltipDataSource="segment" chartLabel="basket"
-                        valueFormatter={(v) => `${v}%`} />
-          </Group>
+          <Title order={2} mb="md" className="flex items-center gap-1.5">
+            Weight by route
+            <InfoDot label="this bar">
+              The whole basket as one bar. Each segment is a route, widest first, and the
+              widths add to 100%. It shows at a glance how concentrated the index is: how much
+              of it rests on the largest few routes.
+            </InfoDot>
+          </Title>
+          <div className="flex h-9 w-full gap-[2px] overflow-hidden">
+            {ordered.map(([pair, v], i) => (
+              <div
+                key={pair}
+                className="group relative flex items-center justify-center"
+                style={{ width: `${v.weight * 100}%`, background: shade(i) }}
+                title={`${pair} — ${sharePct(v.weight)} of the basket`}
+              >
+                {v.weight > 0.075 && (
+                  <span className="px-1 text-[10px] font-medium text-foreground/90">{pair}</span>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+            {ordered.map(([pair, v], i) => (
+              <span key={pair} className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                <span className="inline-block h-2.5 w-2.5 shrink-0 border border-border"
+                      style={{ background: shade(i) }} aria-hidden="true" />
+                {pair} <span className="tabular">{sharePct(v.weight, 1)}</span>
+              </span>
+            ))}
+          </div>
+          <ColorKey
+            className="mt-3"
+            items={[{ color: 'var(--chart-2)', label: 'Share of the basket, darkest is largest' }]}
+            note={`All ${ordered.length} routes shown; the widths sum to \u03a3w = ${d.sum}.`}
+          />
         </Paper>
 
         <Card>
           <Group gap="sm" mb="sm">
             <IconScale size={20} aria-hidden="true" />
-            <Title order={2}>Where airfare sits in the CPI</Title>
+            <Title order={2} className="flex items-center gap-1.5">
+              Where airfare sits in the CPI
+              <InfoDot label="the CPI context">
+                How much of the official Consumer Price Index the airfare item accounts for, and
+                the groups it nests inside. It is the reason a large airfare move barely shifts
+                headline inflation.
+              </InfoDot>
+            </Title>
           </Group>
           {/* A 4-column table does not fit a phone. Scroll the table,
               not the page. */}
-          <Table.ScrollContainer minWidth={880}>
             <Table variant="vertical" withTableBorder={false}>
               <Table.Tbody>
                 <Table.Tr>
@@ -72,16 +107,20 @@ export default function Weights() {
                 </Table.Tr>
               </Table.Tbody>
             </Table>
-          </Table.ScrollContainer>
           <Text size="xs" c="dimmed" mt="md">{cpi.note}</Text>
           <Text size="xs" c="dimmed" mt="xs">{cpi.largest_contributor_note}</Text>
         </Card>
       </SimpleGrid>
 
       <Paper p={0}>
-        <Title order={2} p="lg" pb="sm">Route weights</Title>
-        <Table.ScrollContainer minWidth={720}>
-          <Table striped verticalSpacing="sm" horizontalSpacing="lg">
+        <Title order={2} p="lg" pb="sm" className="flex items-center gap-1.5">
+          Route weights
+          <InfoDot label="how a weight is derived">
+            Passengers carried on the route (DGCA, CY2025) multiplied by its mean base fare,
+            normalised so every route&rsquo;s share sums to 1. Expenditure, not passenger count.
+          </InfoDot>
+        </Title>
+          <Table striped verticalSpacing="sm" horizontalSpacing="sm">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Route</Table.Th>
@@ -101,11 +140,17 @@ export default function Weights() {
               ))}
             </Table.Tbody>
           </Table>
-        </Table.ScrollContainer>
       </Paper>
 
       <Paper>
-        <Title order={2} mb="sm">Lead-time weights</Title>
+        <Title order={2} mb="sm" className="flex items-center gap-1.5">
+          Lead-time weights
+          <InfoDot label="lead-time weights">
+            Each advance-purchase window carries an equal share of the headline. That is a
+            declared assumption, not a measured booking-lag distribution — the real mix of when
+            tickets are bought is not published.
+          </InfoDot>
+        </Title>
         <Text size="sm" c="dimmed">{d.provenance.lead.method}</Text>
         <Group mt="md" gap="xs">
           {Object.entries(d.provenance.lead.weights).map(([lead, w]) => (

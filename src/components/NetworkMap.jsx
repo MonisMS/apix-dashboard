@@ -94,12 +94,24 @@ const BASKET_ROUTES = BASKET_PAIRS.map((pair) => {
   return { pair, from, to };
 }).filter((r) => HUB_MAP[r.from] && HUB_MAP[r.to]);
 
-const TRUNK_WEIGHT_THRESHOLD = 0.07;
+export const TRUNK_WEIGHT_THRESHOLD = 0.07;
 
-export function NetworkMap({ routes = [] }) {
+/** The same filter the map applies, so a panel beside it can show the same
+ *  corridors instead of its own fixed top ten. */
+export function filterRoutes(weighted, mode) {
+  if (mode === 'top5') return [...weighted].sort((a, b) => (b.weight ?? 0) - (a.weight ?? 0)).slice(0, 5);
+  if (mode === 'trunk') return weighted.filter((r) => (r.weight ?? 0) >= TRUNK_WEIGHT_THRESHOLD);
+  return weighted;
+}
+
+export function NetworkMap({ routes = [], filterMode: filterProp, onFilterMode }) {
   const isDarkMode = useSyncExternalStore(subscribeToDocumentDark, getDocumentDarkSnapshot, getDocumentDarkServerSnapshot);
   const [selected, setSelected] = useState(BASKET_ROUTES[0]);
-  const [filterMode, setFilterMode] = useState('all'); // "all" | "top5" | "trunk"
+  // Controlled when the page passes a mode, so the panel beside the map can
+  // follow the same filter; self-managed otherwise.
+  const [ownFilter, setOwnFilter] = useState('all'); // "all" | "top5" | "trunk"
+  const filterMode = filterProp ?? ownFilter;
+  const setFilterMode = onFilterMode ?? setOwnFilter;
   const [hoveredHub, setHoveredHub] = useState(null);
 
   const containerRef = useRef(null);
@@ -120,11 +132,10 @@ export function NetworkMap({ routes = [] }) {
     [byPair],
   );
 
-  const displayedRoutes = useMemo(() => {
-    if (filterMode === 'top5') return [...weightedRoutes].sort((a, b) => b.weight - a.weight).slice(0, 5);
-    if (filterMode === 'trunk') return weightedRoutes.filter((r) => r.weight >= TRUNK_WEIGHT_THRESHOLD);
-    return weightedRoutes;
-  }, [weightedRoutes, filterMode]);
+  const displayedRoutes = useMemo(
+    () => filterRoutes(weightedRoutes, filterMode),
+    [weightedRoutes, filterMode],
+  );
 
   const getControlPoint = useCallback((h1, h2) => {
     const dx = h2.x - h1.x;

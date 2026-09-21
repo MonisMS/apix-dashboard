@@ -7,8 +7,9 @@
 import { Fragment } from 'react';
 import {
   Area, AreaChart as RAreaChart, Bar, BarChart as RBarChart, CartesianGrid,
-  Cell, Line, LineChart as RLineChart, Pie, PieChart, ReferenceLine,
-  ResponsiveContainer, Tooltip, XAxis, YAxis,
+  Cell, LabelList, Line, LineChart as RLineChart, Pie, PieChart, ReferenceLine,
+  ResponsiveContainer, Scatter, ScatterChart as RScatterChart, Tooltip, XAxis,
+  YAxis,
 } from 'recharts';
 import { resolveColor } from './style';
 
@@ -18,12 +19,22 @@ const AXIS = 'var(--muted-foreground)';
 function TooltipBox({ active, payload, label, valueFormatter }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-none border border-border bg-popover p-2 text-xs shadow-none">
-      <div className="mb-1 font-medium text-popover-foreground">{label}</div>
+    <div
+      className="rounded-none border border-border p-2 text-xs"
+      style={{
+        background: 'var(--popover)',
+        color: 'var(--popover-foreground)',
+        boxShadow: '0 2px 8px rgb(0 0 0 / 0.12)',
+      }}
+    >
+      <div className="mb-1 font-medium">{label}</div>
       {payload.map((p) => (
-        <div key={p.dataKey} className="flex items-center gap-2 text-muted-foreground">
-          <span className="inline-block h-2 w-2 rounded-full" style={{ background: p.color }} />
-          <span>{p.name}: {valueFormatter ? valueFormatter(p.value) : p.value}</span>
+        <div key={p.dataKey} className="flex items-center justify-between gap-3 tabular-nums">
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block h-2 w-2 rounded-full" style={{ background: p.color }} />
+            {p.name}
+          </span>
+          <span className="font-medium">{valueFormatter ? valueFormatter(p.value) : p.value}</span>
         </div>
       ))}
     </div>
@@ -39,7 +50,11 @@ export function AreaChart({
         <CartesianGrid stroke={GRID} vertical={false} />
         <XAxis dataKey={dataKey} stroke={AXIS} fontSize={11} tickLine={false} axisLine={{ stroke: GRID }} />
         <YAxis stroke={AXIS} fontSize={11} tickLine={false} axisLine={false} width={40} {...(yAxisProps ?? {})} />
-        <Tooltip content={<TooltipBox valueFormatter={valueFormatter} />} />
+        <Tooltip
+          content={<TooltipBox valueFormatter={valueFormatter} />}
+          wrapperStyle={{ outline: 'none' }}
+          cursor={{ fill: 'var(--muted)', fillOpacity: 0.55, stroke: GRID }}
+        />
         {series.map((s) => (
           <Area
             key={s.name}
@@ -49,6 +64,7 @@ export function AreaChart({
             fill={resolveColor(s.color)}
             fillOpacity={fillOpacity}
             dot={withDots ? { r: 2.5 } : false}
+            activeDot={{ r: 4, strokeWidth: 2, stroke: 'var(--background)' }}
             strokeWidth={1.75}
           />
         ))}
@@ -62,13 +78,37 @@ export function LineChart({
 }) {
   return (
     <ResponsiveContainer width="100%" height={h}>
-      <RLineChart data={data} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+      <RLineChart data={data} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
         <CartesianGrid stroke={GRID} vertical={false} />
         <XAxis dataKey={dataKey} stroke={AXIS} fontSize={11} tickLine={false} axisLine={{ stroke: GRID }} {...(xAxisProps ?? {})} />
         <YAxis stroke={AXIS} fontSize={11} tickLine={false} axisLine={false} width={40} {...(yAxisProps ?? {})} />
-        <Tooltip content={<TooltipBox valueFormatter={valueFormatter} />} />
+        <Tooltip
+          content={<TooltipBox valueFormatter={valueFormatter} />}
+          wrapperStyle={{ outline: 'none' }}
+          cursor={{ stroke: GRID, strokeWidth: 1 }}
+        />
         {referenceLines.map((rl) => (
-          <ReferenceLine key={rl.y} y={rl.y} label={rl.label} stroke={resolveColor(rl.color)} strokeDasharray="4 4" />
+          <ReferenceLine
+            key={rl.y}
+            y={rl.y}
+            stroke={resolveColor(rl.color)}
+            strokeDasharray="4 4"
+            // A bare string label is placed by Recharts at the line's centre
+            // and painted outside the plot area, so "reference = 100" was
+            // clipped by the container edge. Anchoring it inside the plot,
+            // with an explicit fill so it is legible in both themes, keeps it
+            // on screen at every width.
+            label={
+              rl.label
+                ? {
+                    value: rl.label,
+                    position: rl.labelPosition ?? 'insideTopLeft',
+                    fill: AXIS,
+                    fontSize: 11,
+                  }
+                : undefined
+            }
+          />
         ))}
         {series.map((s) => (
           <Line
@@ -77,6 +117,7 @@ export function LineChart({
             dataKey={s.name}
             stroke={resolveColor(s.color)}
             dot={withDots ? { r: 2.5 } : false}
+            activeDot={{ r: 4, strokeWidth: 2, stroke: 'var(--background)' }}
             strokeWidth={1.75}
           />
         ))}
@@ -92,7 +133,11 @@ export function BarChart({ h = 260, data, dataKey, series = [], valueFormatter, 
         <CartesianGrid stroke={GRID} vertical={false} />
         <XAxis dataKey={dataKey} stroke={AXIS} fontSize={11} tickLine={false} axisLine={{ stroke: GRID }} {...(xAxisProps ?? {})} />
         <YAxis stroke={AXIS} fontSize={11} tickLine={false} axisLine={false} width={40} {...(yAxisProps ?? {})} />
-        <Tooltip content={<TooltipBox valueFormatter={valueFormatter} />} />
+        <Tooltip
+          content={<TooltipBox valueFormatter={valueFormatter} />}
+          wrapperStyle={{ outline: 'none' }}
+          cursor={{ fill: 'var(--muted)', fillOpacity: 0.55, stroke: GRID }}
+        />
         {series.map((s) => (
           <Bar key={s.name} dataKey={s.name} fill={resolveColor(s.color)} radius={[3, 3, 0, 0]} maxBarSize={36} />
         ))}
@@ -120,7 +165,11 @@ export function DonutChart({ size = 200, thickness = 26, data = [], valueFormatt
             <Cell key={d.name ?? i} fill={resolveColor(d.color)} />
           ))}
         </Pie>
-        <Tooltip content={<TooltipBox valueFormatter={valueFormatter} />} />
+        <Tooltip
+          content={<TooltipBox valueFormatter={valueFormatter} />}
+          wrapperStyle={{ outline: 'none' }}
+          cursor={{ fill: 'var(--muted)', fillOpacity: 0.55, stroke: GRID }}
+        />
       </PieChart>
       {chartLabel && (
         <div
@@ -187,5 +236,134 @@ export function MatrixChart({
         ))}
       </div>
     </div>
+  );
+}
+
+
+/**
+ * A labelled scatter: each entity placed on two measures at once.
+ *
+ * Added for /routes, where the chart was a ranked bar of one number. A bar
+ * chart of a single static field cannot answer the question that page is
+ * really asking -- whether the routes carrying the most weight are the ones
+ * sitting away from the reference -- because that question is about two
+ * measures together.
+ *
+ * Every point is direct-labelled, so identity never depends on colour, and
+ * colour only repeats the side of the reference line the point already sits
+ * on.
+ */
+export function ScatterPlot({
+  h = 320,
+  data = [],
+  xKey,
+  yKey,
+  labelKey,
+  xName,
+  yName,
+  refY,
+  refLabel,
+  colorOf = () => 'var(--chart-2)',
+  xFormatter = (v) => v,
+  yFormatter = (v) => v,
+  xTicksFormatter,
+  yTicksFormatter,
+}) {
+  const xs = data.map((d) => d[xKey]).filter((v) => v != null);
+  const ys = data.map((d) => d[yKey]).filter((v) => v != null);
+  const padX = (Math.max(...xs) - Math.min(...xs)) * 0.18 || 1;
+  const padY = (Math.max(...ys) - Math.min(...ys)) * 0.18 || 1;
+
+  // Direct labels collide when two entities land close together -- on the
+  // routes data, two pairs sit within ~15px of each other. Decide up/down per
+  // point in normalised space (approximating the plot's aspect) so every
+  // label stays legible without dropping any.
+  const spanX = Math.max(...xs) - Math.min(...xs) || 1;
+  const spanY = Math.max(...ys) - Math.min(...ys) || 1;
+  const placed = [];
+  const below = data.map((d) => {
+    const nx = ((d[xKey] - Math.min(...xs)) / spanX) * 900;
+    const ny = ((d[yKey] - Math.min(...ys)) / spanY) * 300;
+    const clash = placed.some((q) => !q.below && Math.hypot(q.nx - nx, q.ny - ny) < 46);
+    placed.push({ nx, ny, below: clash });
+    return clash;
+  });
+
+  return (
+    <ResponsiveContainer width="100%" height={h}>
+      <RScatterChart margin={{ top: 16, right: 20, left: 4, bottom: 28 }}>
+        <CartesianGrid stroke={GRID} />
+        <XAxis
+          type="number"
+          dataKey={xKey}
+          name={xName}
+          stroke={AXIS}
+          fontSize={11}
+          tickLine={false}
+          axisLine={{ stroke: GRID }}
+          domain={[Math.min(...xs) - padX, Math.max(...xs) + padX]}
+          tickFormatter={xTicksFormatter}
+          label={{ value: xName, position: 'insideBottom', offset: -16, fill: AXIS, fontSize: 11 }}
+        />
+        <YAxis
+          type="number"
+          dataKey={yKey}
+          name={yName}
+          stroke={AXIS}
+          fontSize={11}
+          tickLine={false}
+          axisLine={false}
+          width={46}
+          domain={[Math.min(...ys) - padY, Math.max(...ys) + padY]}
+          tickFormatter={yTicksFormatter}
+          label={{ value: yName, angle: -90, position: 'insideLeft', fill: AXIS, fontSize: 11 }}
+        />
+        {refY != null && (
+          <ReferenceLine
+            y={refY}
+            stroke={AXIS}
+            strokeDasharray="4 4"
+            label={refLabel ? { value: refLabel, position: 'insideTopLeft', fill: AXIS, fontSize: 11 } : undefined}
+          />
+        )}
+        <Tooltip
+          cursor={{ stroke: GRID, strokeDasharray: '3 3' }}
+          wrapperStyle={{ outline: 'none' }}
+          content={({ active, payload }) => {
+            if (!active || !payload?.length) return null;
+            const p = payload[0].payload;
+            return (
+              <div
+                className="rounded-none border border-border p-2 text-xs"
+                style={{ background: 'var(--popover)', color: 'var(--popover-foreground)' }}
+              >
+                <div className="mb-1 font-medium">{p[labelKey]}</div>
+                <div className="tabular-nums">{xName}: {xFormatter(p[xKey])}</div>
+                <div className="tabular-nums">{yName}: {yFormatter(p[yKey])}</div>
+              </div>
+            );
+          }}
+        />
+        <Scatter data={data} isAnimationActive={false}>
+          {data.map((d) => (
+            <Cell key={d[labelKey]} fill={colorOf(d)} r={6} />
+          ))}
+          <LabelList
+            dataKey={labelKey}
+            content={({ x, y, value, index }) => (
+              <text
+                x={x}
+                y={y + (below[index] ? 17 : -10)}
+                textAnchor="middle"
+                fontSize={10}
+                fill={AXIS}
+              >
+                {value}
+              </text>
+            )}
+          />
+        </Scatter>
+      </RScatterChart>
+    </ResponsiveContainer>
   );
 }

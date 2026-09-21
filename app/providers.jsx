@@ -12,7 +12,19 @@ export default function Providers({ children }) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
-        defaultOptions: { queries: { refetchOnWindowFocus: false } },
+        defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: false,
+            // Without this every navigation between dashboard pages refetched
+            // everything from scratch, because the default staleTime is 0.
+            // The index is published once a day, so a five-minute client cache
+            // makes moving around the dashboard instant without ever showing a
+            // level from a superseded vintage.
+            staleTime: 5 * 60 * 1000,
+            gcTime: 30 * 60 * 1000,
+            retry: 1,
+          },
+        },
       }),
   );
 

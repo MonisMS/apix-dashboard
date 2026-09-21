@@ -1,19 +1,27 @@
 'use client';
 
+import { useState } from 'react';
 import { Alert, Badge, Paper, Stack, Table, Text, Title } from '../compat/mantine';
 import { IconAlertTriangle } from '../compat/icons';
 import { useCollection, useRunLog } from '../api';
 import { count, shortDate } from '../format';
 import { pageHeader, queryState } from '../state';
+import { InfoDot } from '../components/InfoDot';
+import { Pager } from '../components/Pager';
+
+const RUN_PAGE = 20;
 
 export default function Collection() {
   const q = useCollection();
   const runs = useRunLog();
+  const [page, setPage] = useState(0);
   const state = queryState(q, runs);
   if (state) return state;
 
   const d = q.data;
   const s = d.summary;
+  const allRuns = runs.data?.runs ?? [];
+  const shownRuns = allRuns.slice(page * RUN_PAGE, page * RUN_PAGE + RUN_PAGE);
 
   return (
     <Stack gap="lg">
@@ -32,33 +40,68 @@ export default function Collection() {
 
       <div className="lc-stats">
         {[
-          ['Observations', count(s.observations)],
-          ['Used by the index', count(s.rows_selected)],
-          ['Sweeps', count(s.sweeps)],
-          ['Basket pax covered', `${d.routes.basket_pax_covered_pct}%`],
-        ].map(([label, value]) => (
+          ['Observations', count(s.observations),
+           'Every individual fare we stored, across every route, day and booking window.'],
+          ['Used by the index', count(s.rows_selected),
+           `Of those, the ones the index actually priced. A fare is left out when a later sweep superseded it, or when it failed the genuineness screen. ${count(s.observations - s.rows_selected)} were not used.`],
+          ['Sweeps', count(s.sweeps),
+           'A sweep is one pass of the collector over the basket. Several can run on one day, and a day can be assembled from more than one of them.'],
+          ['Basket pax covered', `${d.routes.basket_pax_covered_pct}%`,
+           'The share of DGCA passenger traffic, across the whole basket, that sits on routes we actually collected.'],
+        ].map(([label, value, info]) => (
           <div className="lc-stat" key={label}>
-            <span className="k">{label}</span>
+            <span className="k">{label} <InfoDot label={label}>{info}</InfoDot></span>
             <span className="v">{value}</span>
           </div>
         ))}
       </div>
 
       <Paper p={0}>
-        <Title order={2} p="lg" pb="sm">By collection day</Title>
+        <Title order={2} p="lg" pb="sm" className="flex items-center gap-1.5">
+          By collection day
+          <InfoDot label="this table">
+            One row per day the collector ran, showing how much it gathered and how close it
+            kept to its scheduled time.
+          </InfoDot>
+        </Title>
         {/* A 8-column table does not fit a phone. Scroll the table,
             not the page. */}
-        <Table.ScrollContainer minWidth={1240}>
-          <Table striped verticalSpacing="sm" horizontalSpacing="lg">
+          <Table striped verticalSpacing="sm" horizontalSpacing="sm">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Date</Table.Th>
                 <Table.Th ta="right">Observations</Table.Th>
-                <Table.Th ta="right">Cells</Table.Th>
-                <Table.Th ta="right">Sweeps</Table.Th>
-                <Table.Th ta="right">Attempts</Table.Th>
-                <Table.Th ta="right">Failed</Table.Th>
-                <Table.Th ta="right">Collection slot</Table.Th>
+                <Table.Th ta="right" className="hidden lg:table-cell">
+                  <span className="inline-flex items-center gap-1">Cells<InfoDot label="cells" side="left">
+                    A cell is one route x airline x departure band x booking window — the
+                    smallest unit the index prices. This is how many were priced that day.
+                  </InfoDot></span>
+                </Table.Th>
+                <Table.Th ta="right" className="hidden md:table-cell">
+                  <span className="inline-flex items-center gap-1">Sweeps<InfoDot label="sweeps" side="left">
+                    How many passes of the collector contributed to this day.
+                  </InfoDot></span>
+                </Table.Th>
+                <Table.Th ta="right">
+                  <span className="inline-flex items-center gap-1">Attempts<InfoDot label="attempts" side="left">
+                    One attempt is one request to a source for one route at one booking window.
+                    Twelve routes across five windows is sixty attempts for a complete sweep.
+                  </InfoDot></span>
+                </Table.Th>
+                <Table.Th ta="right">
+                  <span className="inline-flex items-center gap-1">Failed<InfoDot label="failed" side="left">
+                    Attempts that returned no usable fares — a timeout, an error, or an empty
+                    result. A failed attempt leaves a gap; it never becomes a guessed price.
+                  </InfoDot></span>
+                </Table.Th>
+                <Table.Th ta="right">
+                  <span className="inline-flex items-center gap-1">Ran at<InfoDot label="when the sweep ran" side="left">
+                    The collector aims for a fixed daily time so that day-on-day changes are
+                    measured at the same point in the booking cycle. The difference from that
+                    time is published rather than hidden, because part of a day-on-day move can
+                    be the clock rather than the market.
+                  </InfoDot></span>
+                </Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -66,35 +109,46 @@ export default function Collection() {
                 <Table.Tr key={day.date}>
                   <Table.Td>{shortDate(day.date)}</Table.Td>
                   <Table.Td ta="right">{count(day.n_observations)}</Table.Td>
-                  <Table.Td ta="right">{day.n_cells}</Table.Td>
-                  <Table.Td ta="right">{day.n_runs}</Table.Td>
+                  <Table.Td ta="right" className="hidden lg:table-cell">{day.n_cells}</Table.Td>
+                  <Table.Td ta="right" className="hidden md:table-cell">{day.n_runs}</Table.Td>
                   <Table.Td ta="right">{day.attempts}</Table.Td>
                   <Table.Td ta="right">
                     {day.failed ? <Badge size="sm" color="red" variant="light">{day.failed}</Badge> : '0'}
                   </Table.Td>
-                  <Table.Td ta="right">
-                    <Text size="xs">{day.nominal_time_ist} IST</Text>
-                    <Text size="xs" c="dimmed">
-                      actual {day.actual_ist.first}–{day.actual_ist.last}
+                  <Table.Td ta="right" className="whitespace-nowrap">
+                    <Text size="xs">{day.actual_ist.first}–{day.actual_ist.last} IST</Text>
+                    <Text size="xs" c={Math.abs(day.drift_minutes) <= 60 ? 'dimmed' : 'orange'}>
+                      {day.drift_minutes >= 0 ? '+' : ''}{day.drift_minutes} min vs {day.nominal_time_ist}
                     </Text>
                   </Table.Td>
                 </Table.Tr>
               ))}
             </Table.Tbody>
           </Table>
-        </Table.ScrollContainer>
       </Paper>
 
       <Paper>
-        <Title order={2} mb="sm">Sweep selection</Title>
+        <Title order={2} mb="sm" className="flex items-center gap-1.5">
+          Sweep selection
+          <InfoDot label="sweep selection">
+            When more than one sweep covers the same route and window on the same day, only one
+            fare can be used. This is the rule that decides which, applied per cell rather than
+            per day.
+          </InfoDot>
+        </Title>
         <Text size="sm" c="dimmed">{d.sweep_selection.rule}</Text>
         <Text size="sm" c="dimmed" mt="xs">{d.sweep_selection.genuineness_screen}</Text>
       </Paper>
 
       <Paper p={0}>
-        <Title order={2} p="lg" pb="sm">Recent fetches</Title>
-        <Table.ScrollContainer minWidth={760}>
-          <Table striped verticalSpacing="xs" horizontalSpacing="lg">
+        <Title order={2} p="lg" pb="sm" className="flex items-center gap-1.5">
+          Recent fetches
+          <InfoDot label="a fetch">
+            One request to a source for one route at one booking window. This is the raw
+            collector log: what was asked for, how many fares came back, and how long it took.
+          </InfoDot>
+        </Title>
+          <Table striped verticalSpacing="xs" horizontalSpacing="sm">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Started</Table.Th>
@@ -106,7 +160,7 @@ export default function Collection() {
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {(runs.data.runs ?? []).slice(0, 40).map((r, i) => (
+              {shownRuns.map((r, i) => (
                 <Table.Tr key={i}>
                   <Table.Td><Text size="xs" c="dimmed">{r.started_at.slice(0, 19)}</Text></Table.Td>
                   <Table.Td><Text size="sm" fw={600}>{r.route}</Text></Table.Td>
@@ -122,7 +176,8 @@ export default function Collection() {
               ))}
             </Table.Tbody>
           </Table>
-        </Table.ScrollContainer>
+        <Pager page={page} pageSize={RUN_PAGE} total={allRuns.length} onPage={setPage}
+               unit="fetches" />
       </Paper>
     </Stack>
   );
