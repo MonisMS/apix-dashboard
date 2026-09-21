@@ -131,8 +131,15 @@ jobs:
       # Recomputes the whole series from Neon and writes a new vintage. The
       # previous one becomes SUPERSEDED in the same transaction, so a reader
       # mid-publish sees the old vintage whole rather than a half-written one.
+      #
+      # Gated on the sweep succeeding, unlike the sync above. The two have
+      # opposite failure preferences: an unsaved fare is lost forever, so sync
+      # runs regardless; a vintage built from half a basket would supersede a
+      # complete one, so publication waits for a clean run. Yesterday's
+      # correct index beats today's partial one.
       - name: Publish the index vintage
-        if: always() && inputs.smoke_test != true && inputs.dry_run != true
+        if: steps.collect.outcome == 'success'
+             && inputs.smoke_test != true && inputs.dry_run != true
         env:
           APIX_PG_URL: ${{ secrets.NEON_DIRECT_URL }}
         run: python -m apix.store.publish --git-sha "$GITHUB_SHA"

@@ -9,6 +9,9 @@ import sys
 
 from . import pg
 
+# Distinct from publish.PUBLISH_LOCK (8_142_026).
+MIGRATE_LOCK = 8_142_027
+
 TRACKER = """
 CREATE TABLE IF NOT EXISTS pg_schema_version (
     version    integer PRIMARY KEY,
@@ -31,6 +34,14 @@ def main() -> int:
         return 1
 
     with pg.connect() as con:
+        # Session-level, held for the whole run. applied() reads the version
+        # once and each migration then commits separately, so two runners can
+        # read the same pending set and both try to apply it -- the loser
+        # fails on the pg_schema_version primary key, having already committed
+        # some of its migrations. A different id from the publish lock so the
+        # two never block each other.
+        con.execute("SELECT pg_advisory_lock(%s)", (MIGRATE_LOCK,))
+
         done = applied(con)
         con.commit()
 

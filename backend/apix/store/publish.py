@@ -394,8 +394,14 @@ def publish(res, con, *, git_sha=None, status="PUBLISHED") -> int:
                 [(run_id, r, why) for r, why in excl.items()])
 
         # Last: retire the old vintage and promote this one, together.
-        con.execute("UPDATE index_run SET status='SUPERSEDED' "
-                    "WHERE status='PUBLISHED' AND id <> %s", (run_id,))
+        #
+        # Only retire when this run is actually taking over. Superseding
+        # unconditionally meant a --status DRAFT run left NO published
+        # vintage: the old one was retired and the new one never promoted,
+        # so every handler reading WHERE status='PUBLISHED' found nothing.
+        if status == "PUBLISHED":
+            con.execute("UPDATE index_run SET status='SUPERSEDED' "
+                        "WHERE status='PUBLISHED' AND id <> %s", (run_id,))
         con.execute("UPDATE index_run SET status=%s WHERE id=%s", (status, run_id))
 
     return run_id

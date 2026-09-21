@@ -34,8 +34,14 @@ def _print_rows(rows):
 def overview(con):
     print("=== row counts ===")
     for t in TABLES:
+        # Each count gets its own savepoint. In psycopg a failed statement
+        # aborts the enclosing transaction, so without this a single missing
+        # table would make every later count report "(missing)" and the
+        # vintage queries below raise outright -- failing the workflow's
+        # summary step over one absent table.
         try:
-            n = con.execute(f"SELECT COUNT(*)::int AS n FROM {t}").fetchone()["n"]
+            with con.transaction():
+                n = con.execute(f"SELECT COUNT(*)::int AS n FROM {t}").fetchone()["n"]
             print(f"  {t:<22} {n:>7}")
         except Exception:
             print(f"  {t:<22} (missing)")

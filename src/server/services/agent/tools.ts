@@ -82,8 +82,12 @@ export const HANDLERS: Record<string, Handler> = {
   }),
 
   get_collection_runs: (_v, args) => {
+    // Both bounds, matching the route handler. The model supplies this, and
+    // a negative value would reach LIMIT, which Postgres rejects -- the tool
+    // would hand the model an error instead of data.
     const raw = Number.parseInt(String(args.limit ?? 20), 10);
-    return runLog(Math.min(Number.isFinite(raw) ? raw : 20, 100));
+    const limit = Math.min(Math.max(Number.isFinite(raw) ? raw : 20, 1), 100);
+    return runLog(limit);
   },
 
   get_validation: async (v) => ({ ...(await validation(v)), audit: await audit(v) }),
