@@ -1,0 +1,645 @@
+{
+  "generated_at": "2026-09-20T09:54:54",
+  "reference": {
+    "label": "APIx (2026-09-10 to 2026-09-20 average = 100, provisional reference window)",
+    "window": [
+      "2026-09-10",
+      "2026-09-11",
+      "2026-09-12",
+      "2026-09-13",
+      "2026-09-14",
+      "2026-09-15",
+      "2026-09-16",
+      "2026-09-17",
+      "2026-09-18",
+      "2026-09-19",
+      "2026-09-20"
+    ],
+    "factor": 1.01744794,
+    "is_provisional": true
+  },
+  "methodology": {
+    "elementary": "Jevons -- unweighted geometric mean of matched price relatives (CPI Manual eq. 9.1; MoSPI EG 4.6.1.1 short index)",
+    "aggregation": "Young -- weighted arithmetic mean of elementary index levels (CPI Manual eq. 9.11; MoSPI EG 4.6.2.4)",
+    "cell": "origin x destination x carrier x departure band x advance-purchase lag; economy, non-stop, INR (MoSPI EG Recommendation 11)",
+    "item": "an individual flight (carrier + flight number) matched between consecutive collection days",
+    "weights": {
+      "route": {
+        "method": "passenger-weighted mean-fare expenditure proxy (DGCA CY2025 pax x arithmetic mean observed fare over the base window)",
+        "caveat": "observed fares are offers, not transactions; this is an offer-mix mean, not a passenger yield",
+        "routes": {
+          "BLR-DEL": {
+            "pax_cy": 4613046,
+            "mean_fare_base": 10955.21,
+            "weight": 0.14624196
+          },
+          "DEL-BOM": {
+            "pax_cy": 6534846,
+            "mean_fare_base": 7218.8,
+            "weight": 0.13650979
+          },
+          "DEL-CCU": {
+            "pax_cy": 2736855,
+            "mean_fare_base": 11298.23,
+            "weight": 0.08947996
+          },
+          "DEL-HYD": {
+            "pax_cy": 3072905,
+            "mean_fare_base": 10048.33,
+            "weight": 0.0893524
+          },
+          "BLR-BOM": {
+            "pax_cy": 3934223,
+            "mean_fare_base": 7738.27,
+            "weight": 0.088098
+          },
+          "BLR-CCU": {
+            "pax_cy": 2199384,
+            "mean_fare_base": 12062.31,
+            "weight": 0.07677062
+          },
+          "MAA-DEL": {
+            "pax_cy": 2294125,
+            "mean_fare_base": 11317.46,
+            "weight": 0.07513277
+          },
+          "CCU-BOM": {
+            "pax_cy": 2278822,
+            "mean_fare_base": 11375.52,
+            "weight": 0.07501448
+          },
+          "DEL-PNQ": {
+            "pax_cy": 2799916,
+            "mean_fare_base": 8523.09,
+            "weight": 0.06905662
+          },
+          "BLR-HYD": {
+            "pax_cy": 2395452,
+            "mean_fare_base": 8393.97,
+            "weight": 0.05818599
+          },
+          "AMD-DEL": {
+            "pax_cy": 2403994,
+            "mean_fare_base": 7003.54,
+            "weight": 0.04872079
+          },
+          "HYD-BOM": {
+            "pax_cy": 2211962,
+            "mean_fare_base": 7410.93,
+            "weight": 0.04743662
+          }
+        },
+        "routes_without_fares": []
+      },
+      "lead": {
+        "method": "uniform -- a DECLARED ASSUMPTION, not derived, not attributed to ONS or MoSPI",
+        "weights": {
+          "1": 0.2,
+          "7": 0.2,
+          "15": 0.2,
+          "30": 0.2,
+          "45": 0.2
+        }
+      },
+      "cell": {
+        "method": "offers-per-day x mean fare within (route, lead); CPI Manual 4.67",
+        "n_cells": 687,
+        "normalisation_factor": 1.0
+      }
+    },
+    "imputation": "explicit, from the parent aggregate's short-term movement; carry-forward is prohibited (CPI Manual 8.54)",
+    "caveat": "MoSPI publishes no airfare-specific compilation rule. Airfare is one priced item, so the generic Jevons-short + Young machinery applies. That is our inference, not a published MoSPI method."
+  },
+  "collection": {
+    "rows_considered": 22845,
+    "rows_selected": 16211,
+    "runs_per_day": {
+      "2026-09-10": [
+        "0294accc1ebe",
+        "2971dedf0649",
+        "fdee24fa24ee"
+      ],
+      "2026-09-11": [
+        "4825c9998bd5"
+      ],
+      "2026-09-12": [
+        "8e1e3cff81f6"
+      ],
+      "2026-09-13": [
+        "527d96f8e2bd"
+      ],
+      "2026-09-14": [
+        "68a51ceb1f48"
+      ],
+      "2026-09-15": [
+        "db75df1043e7"
+      ],
+      "2026-09-16": [
+        "ead1fd37a647"
+      ],
+      "2026-09-17": [
+        "55b6d231b1d3"
+      ],
+      "2026-09-18": [
+        "8f9881ce6700"
+      ],
+      "2026-09-19": [
+        "0a8bd1e6483a"
+      ],
+      "2026-09-20": [
+        "8ea62712ac70"
+      ]
+    },
+    "cells_per_day": {
+      "2026-09-10": 624,
+      "2026-09-11": 621,
+      "2026-09-12": 623,
+      "2026-09-13": 625,
+      "2026-09-14": 636,
+      "2026-09-15": 628,
+      "2026-09-16": 626,
+      "2026-09-17": 620,
+      "2026-09-18": 627,
+      "2026-09-19": 631,
+      "2026-09-20": 640
+    },
+    "excluded_runs": {},
+    "collection_hour_spread": {
+      "2026-09-10": [
+        "00:06",
+        "00:29"
+      ],
+      "2026-09-11": [
+        "14:59",
+        "15:03"
+      ],
+      "2026-09-12": [
+        "08:19",
+        "08:23"
+      ],
+      "2026-09-13": [
+        "16:00",
+        "16:05"
+      ],
+      "2026-09-14": [
+        "10:30",
+        "10:49"
+      ],
+      "2026-09-15": [
+        "10:07",
+        "13:29"
+      ],
+      "2026-09-16": [
+        "05:30",
+        "10:04"
+      ],
+      "2026-09-17": [
+        "10:02",
+        "10:07"
+      ],
+      "2026-09-18": [
+        "07:54",
+        "09:53"
+      ],
+      "2026-09-19": [
+        "09:34",
+        "09:38"
+      ],
+      "2026-09-20": [
+        "09:50",
+        "09:54"
+      ]
+    }
+  },
+  "cleaning": {
+    "enabled": {
+      "hard_bound": true,
+      "mad": false
+    },
+    "hard_bound": {
+      "threshold_log": 1.098612,
+      "threshold_ratio": 3.0,
+      "description": "a fare that changed by more than 3x in one day"
+    },
+    "mad": {
+      "k": 5.0,
+      "min_pool": 10,
+      "pools": "(route, lead) then (route) then (all)",
+      "why_default_off": "The median day-to-day move is exactly zero -- most flights do not reprice -- so MAD collapses to about 0.065 while genuine moves run to -50%/+28% at p5/p95. At k=5 the band would quarantine 6.8% of matched flights for moving more than about a third in a day. That is ordinary airfare behaviour, and screening it out would bias the index toward zero change."
+    },
+    "treatment": "Screened observations are quarantined, not deleted: they leave the matched sample and the cell is imputed from its siblings' movement. No row is ever removed from fare_observation.",
+    "per_day": {
+      "2026-09-11": {
+        "n_relatives": 1386,
+        "n_extreme": 4,
+        "n_mad": 0,
+        "n_screened": 4,
+        "share_screened": 0.002886
+      },
+      "2026-09-12": {
+        "n_relatives": 1405,
+        "n_extreme": 0,
+        "n_mad": 0,
+        "n_screened": 0,
+        "share_screened": 0.0
+      },
+      "2026-09-13": {
+        "n_relatives": 1414,
+        "n_extreme": 4,
+        "n_mad": 0,
+        "n_screened": 4,
+        "share_screened": 0.002829
+      },
+      "2026-09-14": {
+        "n_relatives": 1411,
+        "n_extreme": 3,
+        "n_mad": 0,
+        "n_screened": 3,
+        "share_screened": 0.002126
+      },
+      "2026-09-15": {
+        "n_relatives": 1409,
+        "n_extreme": 1,
+        "n_mad": 0,
+        "n_screened": 1,
+        "share_screened": 0.00071
+      },
+      "2026-09-16": {
+        "n_relatives": 1394,
+        "n_extreme": 3,
+        "n_mad": 0,
+        "n_screened": 3,
+        "share_screened": 0.002152
+      },
+      "2026-09-17": {
+        "n_relatives": 1407,
+        "n_extreme": 3,
+        "n_mad": 0,
+        "n_screened": 3,
+        "share_screened": 0.002132
+      },
+      "2026-09-18": {
+        "n_relatives": 1401,
+        "n_extreme": 3,
+        "n_mad": 0,
+        "n_screened": 3,
+        "share_screened": 0.002141
+      },
+      "2026-09-19": {
+        "n_relatives": 1413,
+        "n_extreme": 2,
+        "n_mad": 0,
+        "n_screened": 2,
+        "share_screened": 0.001415
+      },
+      "2026-09-20": {
+        "n_relatives": 1414,
+        "n_extreme": 12,
+        "n_mad": 0,
+        "n_screened": 12,
+        "share_screened": 0.008487
+      }
+    },
+    "n_flags": 35
+  },
+  "points": [
+    {
+      "series_id": "APIX.ALL",
+      "freq": "D",
+      "period_start": "2026-09-10",
+      "period_end": "2026-09-10",
+      "level": 101.7448,
+      "link": null,
+      "n_cells": 687,
+      "n_cells_imputed": 0,
+      "n_cells_thin": 0,
+      "n_cells_dead": 0,
+      "n_items_matched": 0,
+      "n_items_prev": 0,
+      "n_items_screened": 0,
+      "weight_covered": 1.0,
+      "weight_imputed": 0.0,
+      "n_days": 1,
+      "is_provisional": true,
+      "quality": [
+        "ANCHOR",
+        "BASE_WINDOW_PROVISIONAL"
+      ],
+      "repro_hash": "sha256:0deef1ee6fe9fa4e98e7d8846a2c1fbe52edc95cc74d828d2e8531f6dda066b0"
+    },
+    {
+      "series_id": "APIX.ALL",
+      "freq": "D",
+      "period_start": "2026-09-11",
+      "period_end": "2026-09-11",
+      "level": 99.987,
+      "link": 0.98272338,
+      "n_cells": 687,
+      "n_cells_imputed": 85,
+      "n_cells_thin": 384,
+      "n_cells_dead": 0,
+      "n_items_matched": 1382,
+      "n_items_prev": 1427,
+      "n_items_screened": 4,
+      "weight_covered": 1.0,
+      "weight_imputed": 0.061202,
+      "n_days": 1,
+      "is_provisional": true,
+      "quality": [
+        "BASE_WINDOW_PROVISIONAL"
+      ],
+      "repro_hash": "sha256:2640290ff1407ef2be0be15bcb591e34cb8eaa6b14ddb2f1120beb07a1d8eba8"
+    },
+    {
+      "series_id": "APIX.ALL",
+      "freq": "D",
+      "period_start": "2026-09-12",
+      "period_end": "2026-09-12",
+      "level": 93.8124,
+      "link": 0.93824605,
+      "n_cells": 687,
+      "n_cells_imputed": 82,
+      "n_cells_thin": 389,
+      "n_cells_dead": 0,
+      "n_items_matched": 1405,
+      "n_items_prev": 1457,
+      "n_items_screened": 0,
+      "weight_covered": 1.0,
+      "weight_imputed": 0.057016,
+      "n_days": 1,
+      "is_provisional": true,
+      "quality": [
+        "BASE_WINDOW_PROVISIONAL"
+      ],
+      "repro_hash": "sha256:419b095e4dd124739ec55cfa15d55f38628b6f6f05346730323a0e82360e64be"
+    },
+    {
+      "series_id": "APIX.ALL",
+      "freq": "D",
+      "period_start": "2026-09-13",
+      "period_end": "2026-09-13",
+      "level": 95.0922,
+      "link": 1.01364262,
+      "n_cells": 687,
+      "n_cells_imputed": 82,
+      "n_cells_thin": 390,
+      "n_cells_dead": 0,
+      "n_items_matched": 1409,
+      "n_items_prev": 1454,
+      "n_items_screened": 4,
+      "weight_covered": 1.0,
+      "weight_imputed": 0.054579,
+      "n_days": 1,
+      "is_provisional": true,
+      "quality": [
+        "BASE_WINDOW_PROVISIONAL"
+      ],
+      "repro_hash": "sha256:225e18c21e7ee072fcaf2b82682f3ecbdd9465b6612de10763487e3e02aae64d"
+    },
+    {
+      "series_id": "APIX.ALL",
+      "freq": "D",
+      "period_start": "2026-09-14",
+      "period_end": "2026-09-14",
+      "level": 94.2494,
+      "link": 0.99113619,
+      "n_cells": 687,
+      "n_cells_imputed": 75,
+      "n_cells_thin": 399,
+      "n_cells_dead": 0,
+      "n_items_matched": 1407,
+      "n_items_prev": 1456,
+      "n_items_screened": 3,
+      "weight_covered": 1.0,
+      "weight_imputed": 0.049053,
+      "n_days": 1,
+      "is_provisional": true,
+      "quality": [
+        "BASE_WINDOW_PROVISIONAL"
+      ],
+      "repro_hash": "sha256:e3e36f80dc8efdbfc3b5fed2f557d1ae71e369f429d8c03d0076c25b627bbffe"
+    },
+    {
+      "series_id": "APIX.ALL",
+      "freq": "D",
+      "period_start": "2026-09-15",
+      "period_end": "2026-09-15",
+      "level": 97.5316,
+      "link": 1.03482477,
+      "n_cells": 687,
+      "n_cells_imputed": 72,
+      "n_cells_thin": 401,
+      "n_cells_dead": 0,
+      "n_items_matched": 1408,
+      "n_items_prev": 1460,
+      "n_items_screened": 1,
+      "weight_covered": 1.0,
+      "weight_imputed": 0.046643,
+      "n_days": 1,
+      "is_provisional": true,
+      "quality": [
+        "BASE_WINDOW_PROVISIONAL"
+      ],
+      "repro_hash": "sha256:f99a56891ab4ec8b8878123a59ceb0e4e2fcc1a94640ac61ea8a28f57a6cf9ef"
+    },
+    {
+      "series_id": "APIX.ALL",
+      "freq": "D",
+      "period_start": "2026-09-16",
+      "period_end": "2026-09-16",
+      "level": 105.6349,
+      "link": 1.0830839,
+      "n_cells": 635,
+      "n_cells_imputed": 36,
+      "n_cells_thin": 384,
+      "n_cells_dead": 52,
+      "n_items_matched": 1388,
+      "n_items_prev": 1431,
+      "n_items_screened": 3,
+      "weight_covered": 1.0,
+      "weight_imputed": 0.028998,
+      "n_days": 1,
+      "is_provisional": true,
+      "quality": [
+        "CELLS_RETIRED_52",
+        "BASE_WINDOW_PROVISIONAL"
+      ],
+      "repro_hash": "sha256:ddb0da77267cff7bb8472186ceab7788ad8b26a640b17c43daa7e51ae9cf6bbe"
+    },
+    {
+      "series_id": "APIX.ALL",
+      "freq": "D",
+      "period_start": "2026-09-17",
+      "period_end": "2026-09-17",
+      "level": 104.9782,
+      "link": 0.99378361,
+      "n_cells": 635,
+      "n_cells_imputed": 44,
+      "n_cells_thin": 370,
+      "n_cells_dead": 0,
+      "n_items_matched": 1396,
+      "n_items_prev": 1428,
+      "n_items_screened": 3,
+      "weight_covered": 1.0,
+      "weight_imputed": 0.04005,
+      "n_days": 1,
+      "is_provisional": true,
+      "quality": [
+        "BASE_WINDOW_PROVISIONAL"
+      ],
+      "repro_hash": "sha256:81b9ff07aaddb608f8b8c3480280829a328877086aac689977b1c4f6c58818f6"
+    },
+    {
+      "series_id": "APIX.ALL",
+      "freq": "D",
+      "period_start": "2026-09-18",
+      "period_end": "2026-09-18",
+      "level": 100.4448,
+      "link": 0.95681603,
+      "n_cells": 634,
+      "n_cells_imputed": 43,
+      "n_cells_thin": 371,
+      "n_cells_dead": 1,
+      "n_items_matched": 1392,
+      "n_items_prev": 1432,
+      "n_items_screened": 3,
+      "weight_covered": 1.0,
+      "weight_imputed": 0.040257,
+      "n_days": 1,
+      "is_provisional": true,
+      "quality": [
+        "CELLS_RETIRED_1",
+        "BASE_WINDOW_PROVISIONAL"
+      ],
+      "repro_hash": "sha256:08fbfc9eaa8604845c77ddbdb3a1ed6b98d8a07fce6e9404ce18cf3389850dae"
+    },
+    {
+      "series_id": "APIX.ALL",
+      "freq": "D",
+      "period_start": "2026-09-19",
+      "period_end": "2026-09-19",
+      "level": 102.7153,
+      "link": 1.02260417,
+      "n_cells": 633,
+      "n_cells_imputed": 33,
+      "n_cells_thin": 387,
+      "n_cells_dead": 1,
+      "n_items_matched": 1397,
+      "n_items_prev": 1448,
+      "n_items_screened": 2,
+      "weight_covered": 1.0,
+      "weight_imputed": 0.027609,
+      "n_days": 1,
+      "is_provisional": true,
+      "quality": [
+        "CELLS_RETIRED_1",
+        "BASE_WINDOW_PROVISIONAL"
+      ],
+      "repro_hash": "sha256:9e17c3256c5b60333ee80ad07a710fee9c6a1398fa3ab9f2383557e455d23cab"
+    },
+    {
+      "series_id": "APIX.ALL",
+      "freq": "D",
+      "period_start": "2026-09-20",
+      "period_end": "2026-09-20",
+      "level": 103.8094,
+      "link": 1.01065182,
+      "n_cells": 632,
+      "n_cells_imputed": 29,
+      "n_cells_thin": 395,
+      "n_cells_dead": 1,
+      "n_items_matched": 1386,
+      "n_items_prev": 1433,
+      "n_items_screened": 12,
+      "weight_covered": 1.0,
+      "weight_imputed": 0.022714,
+      "n_days": 1,
+      "is_provisional": true,
+      "quality": [
+        "CELLS_RETIRED_1",
+        "BASE_WINDOW_PROVISIONAL"
+      ],
+      "repro_hash": "sha256:500b3812dee3b6da6e37f348c74464bff8ad795d9c47c68153086048581095e5"
+    }
+  ],
+  "audit": {
+    "transitivity": {
+      "chained_raw_level": 102.029213,
+      "direct_fixed_base": 103.363692,
+      "drift_pct": -1.291053,
+      "note": "Jevons is transitive (Manual 8.383), so on a CONSTANT sample these are identical. The gap is caused by sample churn: cells matched day-to-day but not first-to-last, and vice versa."
+    },
+    "churn": {
+      "2026-09-11": {
+        "items_matched": 1382,
+        "items_prev": 1427,
+        "match_rate": 0.9685,
+        "cells_imputed": 85,
+        "cells_thin": 384
+      },
+      "2026-09-12": {
+        "items_matched": 1405,
+        "items_prev": 1457,
+        "match_rate": 0.9643,
+        "cells_imputed": 82,
+        "cells_thin": 389
+      },
+      "2026-09-13": {
+        "items_matched": 1409,
+        "items_prev": 1454,
+        "match_rate": 0.9691,
+        "cells_imputed": 82,
+        "cells_thin": 390
+      },
+      "2026-09-14": {
+        "items_matched": 1407,
+        "items_prev": 1456,
+        "match_rate": 0.9663,
+        "cells_imputed": 75,
+        "cells_thin": 399
+      },
+      "2026-09-15": {
+        "items_matched": 1408,
+        "items_prev": 1460,
+        "match_rate": 0.9644,
+        "cells_imputed": 72,
+        "cells_thin": 401
+      },
+      "2026-09-16": {
+        "items_matched": 1388,
+        "items_prev": 1431,
+        "match_rate": 0.97,
+        "cells_imputed": 36,
+        "cells_thin": 384
+      },
+      "2026-09-17": {
+        "items_matched": 1396,
+        "items_prev": 1428,
+        "match_rate": 0.9776,
+        "cells_imputed": 44,
+        "cells_thin": 370
+      },
+      "2026-09-18": {
+        "items_matched": 1392,
+        "items_prev": 1432,
+        "match_rate": 0.9721,
+        "cells_imputed": 43,
+        "cells_thin": 371
+      },
+      "2026-09-19": {
+        "items_matched": 1397,
+        "items_prev": 1448,
+        "match_rate": 0.9648,
+        "cells_imputed": 33,
+        "cells_thin": 387
+      },
+      "2026-09-20": {
+        "items_matched": 1386,
+        "items_prev": 1433,
+        "match_rate": 0.9672,
+        "cells_imputed": 29,
+        "cells_thin": 395
+      }
+    }
+  }
+}

@@ -1,9 +1,12 @@
+'use client';
+
 import {
   Calculator, ChartArea, ChartBar, Clock, CloudDownload, EyeOff, Filter,
   Grid3x3, Moon, PlaneTakeoff, Receipt, ReceiptText, Route, Scale, Server,
   Sun, Target,
 } from 'lucide-react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu,
@@ -21,7 +24,8 @@ const NAV = [
     label: 'Index',
     items: [
       { to: '/overview', label: 'Overview', icon: ChartArea },
-      { to: '/index', label: 'Index detail', icon: ChartBar },
+      // Not '/index': Next normalises that to '/', making the page unreachable.
+      { to: '/index-detail', label: 'Index detail', icon: ChartBar },
       { to: '/windows', label: 'Booking windows', icon: Clock },
     ],
   },
@@ -60,7 +64,7 @@ const NAV = [
 ];
 
 function isActive(pathname, to) {
-  return pathname.startsWith(to);
+  return (pathname ?? '').startsWith(to);
 }
 
 function ThemeToggle() {
@@ -127,8 +131,8 @@ function AsideSummary() {
   );
 }
 
-export default function AppLayout() {
-  const location = useLocation();
+export default function AppLayout({ children }) {
+  const pathname = usePathname();
   const { data: index } = useIndex();
 
   return (
@@ -136,7 +140,7 @@ export default function AppLayout() {
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <Sidebar collapsible="offcanvas">
         <SidebarHeader className="px-3 py-3">
-          <Link to="/" className="flex items-baseline gap-1.5">
+          <Link href="/" className="flex items-baseline gap-1.5">
             <span className="font-mono text-sm font-semibold tracking-tight">APIx</span>
             <span className="text-xs text-muted-foreground">Airfare price index</span>
           </Link>
@@ -149,8 +153,8 @@ export default function AppLayout() {
                 <SidebarMenu>
                   {group.items.map(({ to, label, icon: Icon }) => (
                     <SidebarMenuItem key={to}>
-                      <SidebarMenuButton asChild isActive={isActive(location.pathname, to)}>
-                        <Link to={to}>
+                      <SidebarMenuButton asChild isActive={isActive(pathname, to)}>
+                        <Link href={to}>
                           <Icon aria-hidden="true" />
                           <span>{label}</span>
                         </Link>
@@ -173,7 +177,7 @@ export default function AppLayout() {
           <div className="flex items-center gap-2">
             <SidebarTrigger />
             <Separator orientation="vertical" className="h-5" />
-            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+            <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
               apix.dashboard
             </Link>
           </div>
@@ -188,7 +192,7 @@ export default function AppLayout() {
         </header>
         <main id="main-content" className="flex flex-1">
           <div className="apix-main mx-auto w-full max-w-[70rem] flex-1 p-4 md:p-6">
-            <Outlet />
+            {children}
           </div>
           <AsideSummary />
         </main>

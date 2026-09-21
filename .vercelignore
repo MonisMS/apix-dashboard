@@ -1,0 +1,13 @@
+# The Python backend is the data pipeline and the reference implementation.
+# It never executes on Vercel — the live API is app/api/v1/**/route.ts — so
+# keeping it out of the deployment keeps build uploads small.
+backend/
+
+# Docs and local artefacts
+*.md
+!README.md
+__pycache__/
+.pytest_cache/
+*.db
+*.db-wal
+*.db-shm

@@ -1,0 +1,132 @@
+{
+  "source": "DGCA monthly city-pair domestic passenger statistics",
+  "mirror": "github.com/Vonter/india-aviation-traffic (ODbL 1.0)",
+  "reference_year": "2025",
+  "national_total_pax": 166936503,
+  "basket_total_pax": 37475530,
+  "basket_covers_pct_of_national": 22.45,
+  "n_routes": 12,
+  "routes": [
+    {
+      "pair": "DELHI|MUMBAI",
+      "origin": "DEL",
+      "destination": "BOM",
+      "city_a": "DELHI",
+      "city_b": "MUMBAI",
+      "pax_cy": 6534846,
+      "national_share_pct": 3.9146,
+      "weight": 0.174376
+    },
+    {
+      "pair": "BENGALURU|DELHI",
+      "origin": "BLR",
+      "destination": "DEL",
+      "city_a": "BENGALURU",
+      "city_b": "DELHI",
+      "pax_cy": 4613046,
+      "national_share_pct": 2.7634,
+      "weight": 0.123095
+    },
+    {
+      "pair": "BENGALURU|MUMBAI",
+      "origin": "BLR",
+      "destination": "BOM",
+      "city_a": "BENGALURU",
+      "city_b": "MUMBAI",
+      "pax_cy": 3934223,
+      "national_share_pct": 2.3567,
+      "weight": 0.104981
+    },
+    {
+      "pair": "DELHI|HYDERABAD",
+      "origin": "DEL",
+      "destination": "HYD",
+      "city_a": "DELHI",
+      "city_b": "HYDERABAD",
+      "pax_cy": 3072905,
+      "national_share_pct": 1.8408,
+      "weight": 0.081998
+    },
+    {
+      "pair": "DELHI|PUNE",
+      "origin": "DEL",
+      "destination": "PNQ",
+      "city_a": "DELHI",
+      "city_b": "PUNE",
+      "pax_cy": 2799916,
+      "national_share_pct": 1.6772,
+      "weight": 0.074713
+    },
+    {
+      "pair": "DELHI|KOLKATA",
+      "origin": "DEL",
+      "destination": "CCU",
+      "city_a": "DELHI",
+      "city_b": "KOLKATA",
+      "pax_cy": 2736855,
+      "national_share_pct": 1.6395,
+      "weight": 0.07303
+    },
+    {
+      "pair": "AHMEDABAD|DELHI",
+      "origin": "AMD",
+      "destination": "DEL",
+      "city_a": "AHMEDABAD",
+      "city_b": "DELHI",
+      "pax_cy": 2403994,
+      "national_share_pct": 1.4401,
+      "weight": 0.064148
+    },
+    {
+      "pair": "BENGALURU|HYDERABAD",
+      "origin": "BLR",
+      "destination": "HYD",
+      "city_a": "BENGALURU",
+      "city_b": "HYDERABAD",
+      "pax_cy": 2395452,
+      "national_share_pct": 1.4349,
+      "weight": 0.06392
+    },
+    {
+      "pair": "CHENNAI|DELHI",
+      "origin": "MAA",
+      "destination": "DEL",
+      "city_a": "CHENNAI",
+      "city_b": "DELHI",
+      "pax_cy": 2294125,
+      "national_share_pct": 1.3743,
+      "weight": 0.061217
+    },
+    {
+      "pair": "KOLKATA|MUMBAI",
+      "origin": "CCU",
+      "destination": "BOM",
+      "city_a": "KOLKATA",
+      "city_b": "MUMBAI",
+      "pax_cy": 2278822,
+      "national_share_pct": 1.3651,
+      "weight": 0.060808
+    },
+    {
+      "pair": "HYDERABAD|MUMBAI",
+      "origin": "HYD",
+      "destination": "BOM",
+      "city_a": "HYDERABAD",
+      "city_b": "MUMBAI",
+      "pax_cy": 2211962,
+      "national_share_pct": 1.325,
+      "weight": 0.059024
+    },
+    {
+      "pair": "BENGALURU|KOLKATA",
+      "origin": "BLR",
+      "destination": "CCU",
+      "city_a": "BENGALURU",
+      "city_b": "KOLKATA",
+      "pax_cy": 2199384,
+      "national_share_pct": 1.3175,
+      "weight": 0.058689
+    }
+  ],
+  "skipped": []
+}

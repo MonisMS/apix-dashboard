@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 import { useAsk } from '../api';
 import { CopilotIcon } from './CopilotIcon';
 
-const STATIC = import.meta.env.VITE_API_STATIC === '1';
+const STATIC = process.env.NEXT_PUBLIC_API_STATIC === '1';
 
 const SUGGESTIONS = [
   'Why did fares move this week?',

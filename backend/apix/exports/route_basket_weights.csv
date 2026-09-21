@@ -1,0 +1,13 @@
+rank,route,city_a,city_b,pax_cy2025,national_share_pct,basket_weight
+1,DEL-BOM,Delhi,Mumbai,6534846,3.9146,0.174376
+2,BLR-DEL,Bengaluru,Delhi,4613046,2.7634,0.123095
+3,BLR-BOM,Bengaluru,Mumbai,3934223,2.3567,0.104981
+4,DEL-HYD,Delhi,Hyderabad,3072905,1.8408,0.081998
+5,DEL-PNQ,Delhi,Pune,2799916,1.6772,0.074713
+6,DEL-CCU,Delhi,Kolkata,2736855,1.6395,0.07303
+7,AMD-DEL,Ahmedabad,Delhi,2403994,1.4401,0.064148
+8,BLR-HYD,Bengaluru,Hyderabad,2395452,1.4349,0.06392
+9,MAA-DEL,Chennai,Delhi,2294125,1.3743,0.061217
+10,CCU-BOM,Kolkata,Mumbai,2278822,1.3651,0.060808
+11,HYD-BOM,Hyderabad,Mumbai,2211962,1.325,0.059024
+12,BLR-CCU,Bengaluru,Kolkata,2199384,1.3175,0.058689

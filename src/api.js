@@ -2,18 +2,22 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 /**
  * One place that talks to the API, so error-envelope unwrapping and the base
- * URL live in a single file. In dev the Vite proxy forwards /api to uvicorn.
+ * URL live in a single file. The API is app/api/v1/* in this same Next.js
+ * app, so requests are same-origin and CORS never comes up.
  */
-const BASE = import.meta.env.VITE_API_BASE ?? '/api/v1';
+const BASE = process.env.NEXT_PUBLIC_API_BASE ?? '/api/v1';
 
-// In static mode the dashboard reads files instead of calling a service. The
-// index engine is Python, so a live deployment would need a Python host; on a
-// free tier that host sleeps, and a cold start in front of judges is a poor
-// trade for a series that changes once a day. The FastAPI service is unchanged
-// and still runs locally -- it is what generates these files.
-const STATIC = import.meta.env.VITE_API_STATIC === '1';
+// Static mode reads the frozen snapshot in public/data/v1 instead of calling
+// the API. It is an emergency fallback for one situation -- the database is
+// unreachable -- not the normal path.
+//
+// It used to be the default, back when the index engine was Python and a live
+// deployment needed a second host that slept on a free tier. That stopped
+// being true once the engine moved to precomputing into Postgres and the API
+// became route handlers in this same app.
+const STATIC = process.env.NEXT_PUBLIC_API_STATIC === '1';
 
-/** Mirror of the naming scheme in api/dump_static.py. */
+/** Mirror of the naming scheme in scripts/dump-static.ts. */
 function staticUrl(path, params) {
   const suffix = params
     ? '__' +
@@ -42,12 +46,12 @@ export async function get(path, params) {
     throw new Error(
       STATIC
         ? `Could not load ${url}. The static data snapshot may be missing — ` +
-          `regenerate it with: python3 -m api.dump_static`
+          `regenerate it with: npm run dump:static`
         : timedOut
           ? `The APIx API at ${BASE} did not respond within 8 seconds. If it is ` +
             `hosted on a free tier it may be asleep — reload in a few seconds.`
-          : `Cannot reach the APIx API at ${BASE}. Start it locally with: ` +
-            `uvicorn api.main:app --port 8000`,
+          : `Cannot reach the APIx API at ${BASE}. It is served by this same ` +
+            `app -- check the server is running and DATABASE_URL is set.`,
     );
   }
   const body = await res.json().catch(() => null);
@@ -75,8 +79,8 @@ export async function post(path, body) {
     throw new Error(
       timedOut
         ? `AskAI did not respond within 30 seconds. The AI provider may be slow right now.`
-        : `Cannot reach the APIx API at ${BASE}. Start it locally with: ` +
-          `uvicorn api.main:app --port 8000`,
+        : `Cannot reach the APIx API at ${BASE}. It is served by this same ` +
+          `app -- check the server is running and DATABASE_URL is set.`,
     );
   }
   const responseBody = await res.json().catch(() => null);
