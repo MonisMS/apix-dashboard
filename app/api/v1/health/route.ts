@@ -1,5 +1,6 @@
 import { sql, num } from '@/server/db';
 import { API_VERSION, nowIst } from '@/server/envelope';
+import { poolStatus } from '@/server/services/agent/pool';
 
 // Liveness: never cached, and it must answer even when no vintage exists.
 export const dynamic = 'force-dynamic';
@@ -14,7 +15,11 @@ export const dynamic = 'force-dynamic';
  */
 const EXPECTED_PG_SCHEMA = 8;
 
-export async function GET() {
+export async function GET(request: Request) {
+  // Opt-in, because it costs a round trip per key to OpenRouter. Liveness has
+  // to stay fast and has to answer when the provider is unreachable, so the
+  // AskAI quota readout hangs off ?pool=1 rather than the default response.
+  const wantPool = new URL(request.url).searchParams.get('pool') === '1';
   try {
     const [obsRows, schemaRows, runRows, writeRows] = await Promise.all([
       sql`SELECT COUNT(*)::int AS n, MAX(collected_at) AS last FROM fare_observation`,
@@ -39,6 +44,11 @@ export async function GET() {
 
     const ok = schema !== null && schema >= EXPECTED_PG_SCHEMA && run !== null;
 
+    // Distinct workspaces are distinct free-tier buckets; two keys from one
+    // account share one cap and are not extra headroom. Reporting the
+    // workspace keeps that checkable instead of assumed.
+    const pool = wantPool ? await poolStatus() : null;
+
     return Response.json({
       status: ok ? 'ok' : 'degraded',
       api_version: API_VERSION,
@@ -52,6 +62,21 @@ export async function GET() {
         role: perm.role,
         api_can_write: Boolean(perm.can_write),
       },
+      ...(pool
+        ? {
+            askai: {
+              endpoints: pool.length,
+              distinct_accounts: new Set(
+                pool.map((p) => p.workspace_id).filter(Boolean),
+              ).size,
+              free_calls_remaining: pool.reduce(
+                (n, p) => n + (p.free_model_daily_requests?.remaining ?? 0),
+                0,
+              ),
+              detail: pool,
+            },
+          }
+        : {}),
       // Replaces the old in-process `cache` block. There is no cache to report:
       // the index is precomputed by the pipeline, not built per request.
       vintage: run
