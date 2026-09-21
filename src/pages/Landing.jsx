@@ -12,6 +12,8 @@ import { SERIES_COLORS } from '../chartTokens';
 import { Globe } from '../components/Globe';
 import { NetworkMap } from '../components/NetworkMap';
 import { GuidedTour } from '../components/GuidedTour';
+import AskAI from '../components/AskAI';
+import { CopilotIcon } from '../components/CopilotIcon';
 import { useDarkMode } from '../hooks/useDarkMode';
 
 const STATIC = import.meta.env.VITE_API_STATIC === '1';
@@ -272,6 +274,17 @@ export default function Landing() {
             </nav>
 
             <div className="ml-auto flex shrink-0 items-center gap-5">
+              <AskAI
+                trigger={
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-10 gap-1.5 rounded-[7px] px-4 text-[14.5px] font-medium"
+                  >
+                    <CopilotIcon size={16} /> AskAI
+                  </Button>
+                }
+              />
               <Button
                 size="sm"
                 className="h-10 rounded-[7px] px-4 text-[14.5px] font-medium"

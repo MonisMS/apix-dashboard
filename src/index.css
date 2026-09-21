@@ -945,3 +945,50 @@
 @media (max-width: 900px) {
   .netmap-layout { grid-template-columns: 1fr; }
 }
+
+/* AskAI's mark: a squircle with eyes that track the cursor, blink, wink on
+   hover, and scan side-to-side while a question is in flight. */
+.copilot-icon-body {
+  fill: var(--foreground);
+  transition: fill 0.2s ease;
+}
+.copilot-icon-eye {
+  fill: var(--background);
+  transform-box: fill-box;
+  transform-origin: center center;
+  animation: copilot-eye-blink 4.5s infinite ease-in-out;
+}
+.copilot-icon-eye-right {
+  animation-delay: 0.08s;
+}
+@keyframes copilot-eye-blink {
+  0%, 88%, 94%, 100% { transform: scaleY(1); }
+  91% { transform: scaleY(0.1); }
+}
+.copilot-icon-svg {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+button:hover > .copilot-icon-svg:not(.is-thinking) {
+  transform: scale(1.08) rotate(-3deg);
+}
+button:hover > .copilot-icon-svg:not(.is-thinking) .copilot-icon-eye {
+  animation: copilot-eye-wink 0.5s ease-in-out;
+}
+@keyframes copilot-eye-wink {
+  0%, 100% { transform: scaleY(1); }
+  40% { transform: scaleY(0.15); }
+}
+.copilot-icon-eyes.is-scanning {
+  animation: copilot-eye-scan 1s ease-in-out infinite alternate;
+}
+@keyframes copilot-eye-scan {
+  0% { transform: translateX(-2.2px); }
+  100% { transform: translateX(2.2px); }
+}
+.copilot-icon-svg.is-thinking .copilot-icon-body {
+  animation: copilot-thinking-pulse 1s ease-in-out infinite alternate;
+}
+@keyframes copilot-thinking-pulse {
+  0% { opacity: 0.8; }
+  100% { opacity: 1; }
+}

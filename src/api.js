@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 /**
  * One place that talks to the API, so error-envelope unwrapping and the base
@@ -56,6 +56,42 @@ export async function get(path, params) {
     throw new Error(err ? `${err.code}: ${err.message}` : `HTTP ${res.status}`);
   }
   return body;
+}
+
+/** POST helper for AskAI -- same error-envelope unwrapping as `get`, longer
+ * timeout since a tool-calling LLM round trip is slower than a DB read. */
+export async function post(path, body) {
+  const url = `${BASE}${path}`;
+  let res;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30000),
+    });
+  } catch (e) {
+    const timedOut = e?.name === 'TimeoutError' || e?.name === 'AbortError';
+    throw new Error(
+      timedOut
+        ? `AskAI did not respond within 30 seconds. The AI provider may be slow right now.`
+        : `Cannot reach the APIx API at ${BASE}. Start it locally with: ` +
+          `uvicorn api.main:app --port 8000`,
+    );
+  }
+  const responseBody = await res.json().catch(() => null);
+  if (!res.ok) {
+    const err = responseBody?.error;
+    throw new Error(err ? err.message : `HTTP ${res.status}`);
+  }
+  return responseBody;
+}
+
+/** AskAI: {question, history} -> {answer, tools_used, model, ...envelope}. */
+export function useAsk() {
+  return useMutation({
+    mutationFn: ({ question, history }) => post('/ask', { question, history }),
+  });
 }
 
 /** Small wrapper so every page gets the same caching and retry behaviour. */

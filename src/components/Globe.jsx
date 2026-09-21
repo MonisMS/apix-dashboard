@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { geoGraticule, geoOrthographic, geoPath } from 'd3-geo';
 import { feature } from 'topojson-client';
 import { AIRPORTS, BASKET_ROUTES } from '../data/airports';
+import INDIA_BOUNDARY from '../data/indiaBoundary.json';
 import { useRoutes } from '../api';
 
 /**
@@ -17,6 +18,14 @@ import { useRoutes } from '../api';
  * transform, and the boundaries come from world-atlas topojson rather than an
  * inlined coordinate array, so the landmasses are real geography and d3
  * handles horizon clipping (clipAngle 90) instead of us splitting rings by eye.
+ *
+ * India itself is NOT taken from world-atlas: that dataset's India polygon
+ * tops out at ~35.5N, short of India's actual northern extent (~37.1N),
+ * which cuts off Ladakh/Aksai Chin -- effectively drawing India without the
+ * full extent of Jammu & Kashmir. `indiaBoundary.json` is a locally bundled,
+ * pre-simplified outline (from datameet/maps' composite boundary, which
+ * follows India's official claimed territory) used in its place, at ~37.1N,
+ * so the highlighted India on the globe is not the disputed/incomplete one.
  */
 
 const WORLD_TOPOJSON = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
@@ -48,7 +57,7 @@ function facing(lon, lat, cLon, cLat) {
 export function Globe({ className, ...rest }) {
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
-  const worldRef = useRef(null);
+  const worldRef = useRef({ rest: null, india: INDIA_BOUNDARY });
   const routeDataRef = useRef([]);
 
   const { data } = useRoutes();
@@ -66,9 +75,9 @@ export function Globe({ className, ...rest }) {
       .then((topo) => {
         if (cancelled) return;
         const countries = feature(topo, topo.objects.countries).features;
-        worldRef.current = {
-          rest: { type: 'FeatureCollection', features: countries.filter((f) => String(f.id) !== INDIA_ID) },
-          india: countries.find((f) => String(f.id) === INDIA_ID) ?? null,
+        worldRef.current.rest = {
+          type: 'FeatureCollection',
+          features: countries.filter((f) => String(f.id) !== INDIA_ID),
         };
       })
       // No network, no landmasses -- the globe still renders its ocean,

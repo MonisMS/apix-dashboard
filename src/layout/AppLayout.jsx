@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/sonner';
+import AskAI from '../components/AskAI';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { useCollection, useIndex } from '../api';
 import { count, idx, sharePct, shortDate } from '../format';
@@ -192,6 +193,7 @@ export default function AppLayout() {
           <AsideSummary />
         </main>
       </SidebarInset>
+      <AskAI />
       <Toaster />
     </SidebarProvider>
   );
